@@ -1,0 +1,51 @@
+# Build Artifacts
+*.ilk
+*.iobj
+*.ipdb
+*.obj
+*.pch
+*.pgc
+*.pgd
+*.pdb
+*.rsp
+*.sbr
+*.tmp
+*.tmp_proj
+
+# Build Directories
+[Dd]ebug*/
+[Rr]elease*/
+
+# Editor Directories
+.vscode/
+.idea/
+
+# Temp Files
+*.aps
+*.log
+*.meta
+*_i.c
+*_i.h
+*_p.c
+*tlog/
+dlldata.c
+
+# Database Files
+*.VC.VC.opendb
+*.VC.db
+*.cachefile
+*.ncb
+*.opensdf
+*.sdf
+
+# Other Specific Files
+*.suo
+*.svclog
+*.tlb
+*.tlh
+*.tli
+*.user
+
+# OS Junk Files
+*.DS_Store
+[Tt]humbs.db

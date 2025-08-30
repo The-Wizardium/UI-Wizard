@@ -1,0 +1,20 @@
+<svg width="200" height="40" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sapphire {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      font-size: 32px;
+      font-weight: bold;
+      fill: #4c64ed;
+      text-anchor: middle;
+    }
+    @keyframes sapphire-pulse {
+      0% { fill: #ffffff; }
+      50% { fill: #4c64ed; }
+      100% { fill: #ffffff; }
+    }
+    .pulse {
+      animation: sapphire-pulse 4s ease-in-out infinite;
+    }
+  </style>
+  <text x="100" y="30" class="sapphire pulse">UI Wizard</text>
+</svg>

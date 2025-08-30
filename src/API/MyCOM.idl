@@ -1,0 +1,94 @@
+/////////////////////////////////////////////////////////////////////////////////
+// * FB2K Component: UI Wizard                                               * //
+// * Description:    MyCOM Type Library File                                 * //
+// * Author:         TT                                                      * //
+// * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
+// * Version:        0.1                                                     * //
+// * Dev. started:   12-12-2024                                              * //
+// * Last change:    22-12-2024                                              * //
+/////////////////////////////////////////////////////////////////////////////////
+
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+	object,
+	uuid(E4F5C6B7-D890-41A2-9145-7890BCDEF213), // UUID for MyCOMAPI
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface MyCOMAPI : IDispatch {
+	// * PUBLIC API - DISPLAY PROPERTIES * //
+	[propget, id(1)] HRESULT DisplayDPI([out, retval] LONG* pValue);
+	[propget, id(2)] HRESULT DisplayResolutionMode([out, retval] BSTR* pValue);
+	[propget, id(3)] HRESULT DisplayResolution([out, retval] BSTR* pValue);
+	[propget, id(4)] HRESULT DisplayResolutionMultiMonitors([out, retval] BSTR* pValue);
+
+	// * PUBLIC API - WINDOW GEOMETRY PROPERTIES * //
+	[propget, id(5)] HRESULT WindowX([out, retval] LONG* pValue);
+	[propget, id(6)] HRESULT WindowY([out, retval] LONG* pValue);
+	[propget, id(7)] HRESULT WindowWidth([out, retval] LONG* pValue);
+	[propget, id(8)] HRESULT WindowHeight([out, retval] LONG* pValue);
+
+	// * PUBLIC API - WINDOW SIZE CONSTRAINTS PROPERTIES * //
+	[propput, id(9)] HRESULT WindowMinSize([in] VARIANT newState);
+	[propput, id(10)] HRESULT WindowMinWidth([in] VARIANT newValue);
+	[propput, id(11)] HRESULT WindowMinHeight([in] VARIANT newValue);
+	[propput, id(12)] HRESULT WindowMaxSize([in] VARIANT newState);
+	[propput, id(13)] HRESULT WindowMaxWidth([in] VARIANT newValue);
+	[propput, id(14)] HRESULT WindowMaxHeight([in] VARIANT newValue);
+
+	// * PUBLIC API - WINDOW APPEARANCE PROPERTIES * //
+	[propput, id(15)] HRESULT WindowBgColor([in] VARIANT newValue);
+	[propget, id(16)] HRESULT DarkMode([out, retval] VARIANT_BOOL* pState);
+	[propput, id(16)] HRESULT DarkMode([in] VARIANT newState);
+	[propget, id(17)] HRESULT FrameStyle([out, retval] LONG* pValue);
+	[propput, id(17)] HRESULT FrameStyle([in] VARIANT newValue);
+
+	// * PUBLIC API - WINDOW BEHAVIOR PROPERTIES * //
+	[propget, id(18)] HRESULT MoveStyle([out, retval] long* pValue);
+	[propput, id(18)] HRESULT MoveStyle([in] VARIANT newValue);
+	[propget, id(19)] HRESULT DisableWindowMaximizing([out, retval] VARIANT_BOOL* pState);
+	[propput, id(19)] HRESULT DisableWindowMaximizing([in] VARIANT newState);
+	[propget, id(20)] HRESULT DisableWindowSizing([out, retval] VARIANT_BOOL* pState);
+	[propput, id(20)] HRESULT DisableWindowSizing([in] VARIANT newState);
+
+	// * PUBLIC API - WINDOW STATE PROPERTIES * //
+	[propget, id(21)] HRESULT WindowState([out, retval] long* pValue);
+
+	// * PUBLIC API - WINDOW MANIPULATION METHODS * //
+	HRESULT SetCaptionAreaSize([in] int x, [in] int y, [in] int w, [in] int h);
+	HRESULT SetWindowPosition([in] int x, [in] int y);
+	HRESULT SetWindowPositionInGrid([in] BSTR position);
+	HRESULT SetWindowSize([in] int width, [in] int height);
+	HRESULT SetWindowSizeLimits([in] int minWidth, [in] int minHeight, [in] int maxWidth, [in] int maxHeight);
+
+	// * PUBLIC API - WINDOW METRICS METHODS * //
+	HRESULT LoadWindowMetrics();
+	HRESULT SaveWindowMetrics();
+
+	// * PUBLIC API - WINDOW STATE METHODS * //
+	HRESULT ToggleFullscreen();
+	HRESULT ExitFullscreen();
+	HRESULT ToggleMaximize();
+	HRESULT ExitMaximize();
+};
+
+[
+	uuid(B2A3C4D5-F6E7-4891-9245-6789ABCDEF23), // UUID for MyCOMLIB
+	version(1.0),
+]
+library MyCOMLIB {
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(D9FDD234-4553-40B4-8962-E9D9F1B8EE99) // UUID for MyCOM coclass
+	]
+	coclass MyCOM {
+		[default] interface MyCOMAPI;
+	};
+};
