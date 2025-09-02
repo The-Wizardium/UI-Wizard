@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Callbacks Header File                         * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1                                                     * //
+// * Version:        0.1.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    22-12-2024                                              * //
+// * Last change:    01-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -37,7 +37,7 @@ public:
 	void on_playback_starting(play_control::t_track_command p_command, bool p_paused) noexcept override;
 	void on_playback_stop(play_control::t_stop_reason p_reason) noexcept override;
 	void on_playback_time(double p_time) noexcept override;
-	void on_volume_change(float p_new_val) noexcept override;   
+	void on_volume_change(float p_new_val) noexcept override;
 };
 
 FB2K_SERVICE_FACTORY(UIWizardCallbacks);

@@ -3,16 +3,16 @@
 // * Description:    UI Wizard Source File                                   * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1                                                     * //
+// * Version:        0.1.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    22-12-2024                                              * //
+// * Last change:    01-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
 #include "UIW_PCH.h"
 #include "MyCOM.h"
 #include "UIW.h"
-#include <UIW_Helpers.h>
+#include "UIW_Helpers.h"
 #include "UIW_Menu.h"
 
 
@@ -21,14 +21,27 @@
 /////////////////////////
 #pragma region Component Setup
 DECLARE_COMPONENT_VERSION(
-	"UI Wizard", "0.1",
+	"UI Wizard", "0.1.0",
+
 	"UI Wizard \n"
-	"The Azure Spell of Interface Enchantment \n"
-	"A Sacred Chapter of The Wizardium \n"
+	"The Sapphire Spell Of Interface Enchantment \n"
+	"Lux Etherea Imperat \n\n"
+
+	"A Sacred Chapter Of The Wizardium \n"
+	"https://www.The-Wizardium.org \n"
 	"https://github.com/The-Wizardium \n\n"
-	"Woven from the azure mists of the Holy Foobar Land, UI Wizard bends foobar2000's interface to your will.\n"
-	"This spellbinding art conjures window styles, Aero effects, and scripting sorcery via COM/ActiveX.\n"
-	"Craft enchanted layouts with mischievous elegance and etch your legend in The Wizardium's grimoire."
+
+	"Sealed within the luminous Sapphiraz Sanctum of the Holy Foobar Land, "
+	"UI Wizard reshapes foobar2000's form with celestial grace. "
+	"Craft enchanted interfaces with Aero effects, borderless designs, "
+	"and dynamic layouts, all commanded through ActiveX scripting. \n\n"
+
+	"Shape the mystic canvas: \n"
+	"- Customize frame styles, transparency, and titles. \n"
+	"- Control window positioning and snap-to-edge behavior. \n"
+	"- Script fluid layouts with JavaScript. \n\n"
+
+	"The Wizardium Chooses Only The Anointed"
 );
 
 DEFINE_GUID(UIWizard, 0xf3a2b1c4, 0x8d05, 0x4c21, 0x9f, 0x3d, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc);
