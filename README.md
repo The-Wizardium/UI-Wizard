@@ -33,10 +33,10 @@
 
 <!-- #region CHRONICLES OF THE SAPPHIRE SANCTUM -->
 
-*Sealed within the mist-shrouded **Sapphiraz Sanctum**, where ethereal interfaces shimmer in eternal twilight,
-the *UI Wizard* (foo_ui_wizard) is a spellbinding chapter of *The Wizardium*’s grimoire. Its runic seal,
-broken only by those who master window enchantment, reshapes foobar2000’s interface with mischievous elegance,
-from glass-like Aero effects to borderless designs.*
+*Sealed within the luminous **Sapphiraz Sanctum**, where ethereal interfaces shimmer in eternal twilight,
+the **UI Wizard** is a spellbinding chapter of **The Wizardium**’s grimoire.
+Its runic seal, the radiant **ᛋ Sowilo**, yields only to masters of window enchantment, reshaping foobar2000’s
+form with mischievous elegance — from glass-like Aero effects to borderless designs that defy mortal UI constraints.*
 
 <br>
 
@@ -49,6 +49,14 @@ from glass-like Aero effects to borderless designs.*
 <br>
 
 ## Arcana Of The Sapphire Spell
+
+<br>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/images/UI-Wizard-Preferences-Dark.jpg">
+    <img src="assets/images/UI-Wizard-Preferences-Light.jpg" alt="UI Wizard Preferences Screenshot">
+  </picture>
+<br>
+<br>
 
 - **Window Appearance Customization**:
   - Supports multiple frame styles: Default, Small Caption, No Caption, No Border.
@@ -84,7 +92,7 @@ from glass-like Aero effects to borderless designs.*
 ## Perform The Ritual
 
 01. **Invoke** foobar2000's installation ceremony.
-02. **Channel** this sacred chapter from its [GitHub sanctum](https://github.com/The-Wizardium/UI-Wizard).
+02. **Channel** this sacred chapter from its [Sapphiraz Sanctum](https://github.com/The-Wizardium/UI-Wizard).
 03. **Bind** the component to your foobar2000 essence.
 
 <br>
@@ -98,28 +106,16 @@ from glass-like Aero effects to borderless designs.*
 
 <br>
 
-<details>
-  <summary>Show UI Wizard Preferences Screenshot (click to expand)</summary>
-  <br>
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="assets/images/UI-Wizard-Preferences-Dark.jpg">
-      <img src="assets/images/UI-Wizard-Preferences-Light.jpg" alt="UI Wizard Preferences Screenshot">
-    </picture>
-  <br>
-</details>
-
-<br>
-
 - **Scripting with JavaScript**:
   01. Use Spider Monkey Panel or JSplitter to access the UI Wizard API.
-  02. Instantiate the `UIWizard` ActiveX object to manipulate window properties and behaviors programmatically.
+  02. Instantiate the `UIWizard` ActiveX object to programmatically control window properties and behaviors.
   03. See the [API documentation](API.md) for examples and reference.
 
 <br>
 
 ## Enhance The Arcana
 
-For detailed information on the JavaScript API, including usage examples and a complete reference of properties and methods,<br>
+For detailed information on the JavaScript API, including usage examples and a complete reference of properties and methods,
 see the [API documentation](API.md).
 
 <br>
@@ -135,8 +131,8 @@ New Arcane Arts are ever welcome! Prove your mastery:
 
 ## Hall Of Honorable Scholars
 
-- Peter Pawlowski for [foobar2000](https://www.foobar2000.org), the sacred canvas we’ve enchanted with Arcane Arts —
-[oops, Peter, we did it again! 😈](https://www.youtube.com/watch?v=qItugh-fFgg)
+- Peter Pawlowski for [foobar2000](https://www.foobar2000.org), the sacred canvas enchanted with Arcana —
+  [oops, Peter, we did it again! 😈](https://www.youtube.com/watch?v=qItugh-fFgg)
 - Tsuda Kageyu for [MinHook](https://github.com/TsudaKageyu/minhook).
 
 <br>

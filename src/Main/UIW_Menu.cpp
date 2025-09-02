@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Menu Source File                              * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1                                                     * //
+// * Version:        0.1.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    22-12-2024                                              * //
+// * Last change:    01-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -37,12 +37,22 @@ void UIWizardMenu::Quit() {
 // * MAIN MENU * //
 ///////////////////
 #pragma region Main Menu
+#if defined(_WIN64)
 void __fastcall UIWizardMainMenu::GenerateMenuWin32_Hooked(void* pThis, fb2k::hmenu_t p_menu, uint32_t p_id_base, uint32_t p_id_count, uint32_t p_flags) {
-	uint32_t new_flags = p_flags & ~(mainmenu_manager::flag_view_full | mainmenu_manager::flag_view_reduced);
-	
-	new_flags |= UIWizardSettings::showHiddenMenu ? mainmenu_manager::flag_view_full : mainmenu_manager::flag_view_reduced;
+#else
+void __fastcall UIWizardMainMenu::GenerateMenuWin32_Hooked(void* pThis, int dummy, fb2k::hmenu_t p_menu, uint32_t p_id_base, uint32_t p_id_count, uint32_t p_flags) {
+#endif
+	uint32_t new_flags = p_flags;
+	if (UIWizardSettings::showHiddenMenu) {
+		new_flags &= ~(mainmenu_manager::flag_view_full | mainmenu_manager::flag_view_reduced);
+		new_flags |= mainmenu_manager::flag_view_full;
+	}
 
+#if defined(_WIN64)
 	originalGenerateMenuWin32(pThis, p_menu, p_id_base, p_id_count, new_flags);
+#else
+	originalGenerateMenuWin32(pThis, 0 /* dummy */, p_menu, p_id_base, p_id_count, new_flags);
+#endif
 }
 
 void UIWizardMainMenu::InitMainMenuHook() {
@@ -50,10 +60,10 @@ void UIWizardMainMenu::InitMainMenuHook() {
 	void** vtable = *reinterpret_cast<void***>(mm.get_ptr());
 	constexpr int VTABLE_INDEX = 4; // Index for org. generate_menu_win32
 
-	MH_STATUS status = MH_CreateHook(vtable[VTABLE_INDEX], 
+	MH_STATUS status = MH_CreateHook(vtable[VTABLE_INDEX],
 		&GenerateMenuWin32_Hooked, reinterpret_cast<void**>(&originalGenerateMenuWin32)
 	);
-	
+
 	if (status == MH_OK) {
 		MH_EnableHook(vtable[VTABLE_INDEX]);
 	}

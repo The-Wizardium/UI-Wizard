@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1                                                     * //
+// * Version:        0.1.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    22-12-2024                                              * //
+// * Last change:    01-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -250,7 +250,7 @@ void UIWizardWindow::SetBgColor(COLORREF color) {
 void UIWizardWindow::SetCustomIcon() const {
 	if (!UIWizardSettings::customIcon) return;
 
-	UIWHGraphics::SetIcon(mainHwnd, nullptr, 
+	UIWHGraphics::SetIcon(mainHwnd, nullptr,
 		UIWizardSettings::customIcon, UIWizardSettings::customIconPath.c_str()
 	);
 }
@@ -1152,7 +1152,7 @@ void UIWizardShadowWindow::ShadowWindowDisplay() const {
 	const bool currentWindowShadow = UIWizardSettings::hideWindowShadow;
 	static bool lastWindowShadow = UIWizardSettings::hideWindowShadow;
 
-	if (currentFrameStyle == lastFrameStyle && 
+	if (currentFrameStyle == lastFrameStyle &&
 		currentWindowShadow == lastWindowShadow) {
 		return;
 	}
