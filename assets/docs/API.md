@@ -1,8 +1,11 @@
 # UI Wizard - API Reference
 
-*Version 0.1 - Last Updated: 03.08.2025*
+*Version 0.1 - Last Updated: 01.09.2025*
 
-UI Wizard provides a JavaScript API for advanced window management and appearance customization in foobar2000, accessible via a COM/ActiveX interface in scripting environments like [Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel) or [JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378).
+UI Wizard provides a JavaScript API for advanced window management and appearance customization in foobar2000,
+accessible via a COM/ActiveX interface in scripting environments like
+[Spider Monkey Panel](https://github.com/TheQwertiest/foo_spider_monkey_panel) or
+[JSplitter](https://foobar2000.ru/forum/viewtopic.php?t=6378).
 This document is for foobar2000 JavaScript developers, offering practical examples and a complete API reference.
 
 <br>
@@ -193,7 +196,7 @@ Refer to [Usage Examples](#usage-examples) for practical applications.
 ### Properties
 
 | Name                              | Type       | Access        | Description                                                                           |
-|-----------------------------------|------------|---------------|---------------------------------------------------------------------------------------|
+|:----------------------------------|:-----------|:--------------|:--------------------------------------------------------------------------------------|
 | DisplayDPI                        | number     | Read-only     | Current display DPI setting.                                                          |
 | DisplayResolutionMode             | string     | Read-only     | Display resolution mode (e.g., scaling mode).                                         |
 | DisplayResolution                 | string     | Read-only     | Primary display resolution (e.g., "1920x1080").                                       |
@@ -243,7 +246,7 @@ Refer to [Usage Examples](#usage-examples) for practical applications.
 ### Methods
 
 | Name                        | Signature                                                           | Description                                                  |
-|-----------------------------|---------------------------------------------------------------------|--------------------------------------------------------------|
+|:----------------------------|:--------------------------------------------------------------------|:-------------------------------------------------------------|
 | SetCaptionAreaSize          | (x: number, y: number, w: number, h: number) -> void                | Sets the draggable caption area for No Caption/No Border.    |
 | SetWindowPosition           | (x: number, y: number) -> void                                      | Sets the window's top-left position.                         |
 | SetWindowPositionInGrid     | (position: string) -> void                                          | Snaps window to a grid position*.                            |
@@ -286,4 +289,4 @@ Common errors include:
 
 ## Support
 
-- [UI Wizard on Github](https://github.com/TT-ReBORN/foo_ui_wizard)
+- [UI Wizard on Github](https://github.com/The-Wizardium/UI-Wizard)

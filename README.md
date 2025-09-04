@@ -106,17 +106,10 @@ form with mischievous elegance — from glass-like Aero effects to borderless de
 
 <br>
 
-- **Scripting with JavaScript**:
-  01. Use Spider Monkey Panel or JSplitter to access the UI Wizard API.
-  02. Instantiate the `UIWizard` ActiveX object to programmatically control window properties and behaviors.
-  03. See the [API documentation](API.md) for examples and reference.
-
-<br>
-
 ## Enhance The Arcana
 
 For detailed information on the JavaScript API, including usage examples and a complete reference of properties and methods,
-see the [API documentation](API.md).
+see the [API documentation](assets/docs/API.md).
 
 <br>
 
