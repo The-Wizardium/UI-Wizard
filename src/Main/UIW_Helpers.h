@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Helpers Header File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -85,6 +85,10 @@ namespace UIWHConvert {
 	double DOUBLEFromVARIANT(const VARIANT& var, double defaultValue);
 	long INTFromVARIANT(const VARIANT& var, long defaultValue);
 	std::wstring STRINGFromVARIANT(const VARIANT & var, const std::wstring & defaultValue = L"");
+
+	CSize DialogUnitsToPixel(HWND hWnd, int dluX, int dluY);
+	int PercentToPixels(double percent, int dimension);
+	double PixelsToPercent(int pixels, int dimension);
 }
 #pragma endregion
 
@@ -111,7 +115,7 @@ namespace UIWHDarkMode {
 ////////////////////////
 #pragma region Dialog Helpers
 namespace UIWHDialog {
-	bool CreateCustomFont(CFont& font, int height, int weight, const TCHAR* faceName = _T("Tahoma"));
+	bool CreateCustomFont(HWND hWnd, CFont& font, int height, int weight, const TCHAR* faceName = _T("Tahoma"));
 
 	bool GetCheckBoxState(HWND hWnd, int id);
 	void SetCheckBox(HWND hWnd, int id, bool checked);
@@ -166,19 +170,30 @@ namespace UIWHGraphics {
 };
 #pragma endregion
 
+
 ////////////////////////
 // * WINDOW HELPERS * //
 ////////////////////////
 #pragma region Window Helpers
 namespace UIWHWindow {
+	bool IsWindows11();
+
+	bool IsAeroEffect(std::string_view effect);
+	void SetAeroEffect(std::string_view effect);
+	bool IsFrameStyle(std::string_view style);
+	void SetFrameStyle(std::string_view style);
+	bool IsWindowState(std::string_view state);
+	void SetWindowState(std::string_view state);
+
 	int GetWindowX(HWND hWnd);
 	int GetWindowY(HWND hWnd);
 	int GetWindowWidth(HWND hWnd);
 	int GetWindowHeight(HWND hWnd);
+	int GetWindowTitlebarHeight(HWND hWnd);
 
 	void SetWindowPosition(HWND hWnd, int x, int y);
 	void SetWindowPositionInGrid(HWND hWnd, const std::string& position);
-	void ValidateWindowPosition(HWND hWnd, const std::string& resetPosition = "center");
+	void ValidateWindowPosition(HWND hWnd, const std::string& resetPosition = "center", int bufferPx = 10);
 
 	void SetWindowSize(HWND hWnd, int width, int height);
 	void ValidateWindowSize(HWND hWnd);

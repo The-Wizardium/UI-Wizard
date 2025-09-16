@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Preferences Source File                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -32,13 +32,13 @@ UIWizardPreferences::UIWizardPreferences(preferences_page_callback::ptr callback
 #pragma region Initialization
 void UIWizardPreferences::InitFonts() {
 	if (fontGroupbox.IsNull()) {
-		UIWHDialog::CreateCustomFont(fontGroupbox, 26, FW_BOLD);
+		UIWHDialog::CreateCustomFont(m_hWnd, fontGroupbox, 9, FW_BOLD);
 	}
 	CWindow(GetDlgItem(IDC_APPEARANCE_GROUP)).SetFont(fontGroupbox, FALSE);
 	CWindow(GetDlgItem(IDC_CONTROLS_GROUP)).SetFont(fontGroupbox, FALSE);
 
 	if (fontSmall.IsNull()) {
-		UIWHDialog::CreateCustomFont(fontSmall, 14, FW_SEMIBOLD);
+		UIWHDialog::CreateCustomFont(m_hWnd, fontSmall, 5, FW_SEMIBOLD);
 	}
 	CWindow(GetDlgItem(IDC_CAPTION_AREA_TEXT)).SetFont(fontSmall, FALSE);
 	CWindow(GetDlgItem(IDC_GLASS_FRAME_AREA_TEXT)).SetFont(fontSmall, FALSE);
@@ -231,12 +231,12 @@ void UIWizardPreferences::InitAllControlEnableState() {
 		IDC_UNSNAP_SIZE_TEXT, IDC_UNSNAP_SIZE
 	}, UIWHDialog::GetCheckBoxState(m_hWnd, IDC_SNAP_EDGE));
 
-	UIWHDialog::SetControlEnableState(m_hWnd, { 
+	UIWHDialog::SetControlEnableState(m_hWnd, {
 		IDC_WINDOW_MIN_WIDTH, IDC_WINDOW_MIN_WIDTH_SPIN, IDC_WINDOW_MIN_WIDTH_BUTTON,
 		IDC_WINDOW_MIN_HEIGHT, IDC_WINDOW_MIN_HEIGHT_SPIN, IDC_WINDOW_MIN_HEIGHT_BUTTON
 	}, UIWHDialog::GetCheckBoxState(m_hWnd, IDC_WINDOW_MIN_SIZE));
 
-	UIWHDialog::SetControlEnableState(m_hWnd, { 
+	UIWHDialog::SetControlEnableState(m_hWnd, {
 		IDC_WINDOW_MAX_WIDTH, IDC_WINDOW_MAX_WIDTH_SPIN, IDC_WINDOW_MAX_WIDTH_BUTTON,
 		IDC_WINDOW_MAX_HEIGHT, IDC_WINDOW_MAX_HEIGHT_SPIN, IDC_WINDOW_MAX_HEIGHT_BUTTON
 	}, UIWHDialog::GetCheckBoxState(m_hWnd, IDC_WINDOW_MAX_SIZE));

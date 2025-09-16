@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Preferences Header File                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -131,16 +131,16 @@ class UIWizardPreferencesImpl : public preferences_page_impl<UIWizardPreferences
 public:
 	virtual ~UIWizardPreferencesImpl() = default;
 
-	const char* get_name() override { 
-		return "UI Wizard"; 
+	const char* get_name() override {
+		return "UI Wizard";
 	}
 
 	GUID get_guid() override {
 		return GUID{ 0x213bd677, 0x5ddc, 0x4534, { 0x90, 0x65, 0xc8, 0x6, 0xc5, 0x4e, 0xff, 0xc9 } };
 	}
 
-	GUID get_parent_guid() override { 
-		return guid_display; 
+	GUID get_parent_guid() override {
+		return guid_display;
 	}
 };
 

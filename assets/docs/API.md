@@ -1,6 +1,51 @@
+<div align="center">
+  <br>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../images/UI-Wizard-Logo.svg">
+    <img src="../images/UI-Wizard-Logo.svg" width="400" alt="UI Wizard Logo">
+  </picture>
+  <br>
+  <br>
+</div>
+
+<div align="center">
+  <h1>
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="../images/UI-Wizard-Title-Dark.svg">
+      <img src="../images/UI-Wizard-Title-Light.svg" alt="UI Wizard Title">
+    </picture>
+  </h1>
+</div>
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../images/UI-Wizard-Subtitle-Dark.svg">
+    <img src="../images/UI-Wizard-Subtitle-Light.svg" alt="UI Wizard Subtitle">
+  </picture>
+</div>
+
+<br>
+<br>
+
+*In the radiant depths of the **Sapphiraz Sanctum**, where the **Sapphire Spell** weaves its luminous threads,
+the scribes of **The Wizardium** have transcribed the arcane sigils of control.
+This sacred codex unveils the complete incantations - properties to bind, methods to command,
+and exemplars to guide - granting worthy scholars absolute dominion over the window's ethereal form,
+from its crystalline geometry to its very state of being.*
+
+<br>
+
+<h3 align="center"><em><span title="The Ethereal Light Commands">⸺ Lux Etherea Imperat ⸺</span></em></h3>
+<div align="center"><a href="https://github.com/The-Wizardium">A Sacred Chapter Of The Wizardium</a></div>
+
+<br>
+<h2></h2>
+<br>
+<br>
+
 # UI Wizard - API Reference
 
-*Version 0.1 - Last Updated: 01.09.2025*
+*Version 0.2 - Last Updated: 16.09.2025*
 
 UI Wizard provides a JavaScript API for advanced window management and appearance customization in foobar2000,
 accessible via a COM/ActiveX interface in scripting environments like
@@ -258,6 +303,8 @@ Refer to [Usage Examples](#usage-examples) for practical applications.
 | ExitFullscreen              | () -> void                                                          | Exits fullscreen mode, restoring normal state.               |
 | ToggleMaximize              | () -> void                                                          | Toggles between maximized and normal state.                  |
 | ExitMaximize                | () -> void                                                          | Exits maximized mode, restoring normal state.                |
+| WindowMinimize              | () -> void                                                          | Minimizes the window to the taskbar.                         |
+| WindowRestore               | () -> void                                                          | Restores the window from the minimized state.                |
 
 * SetWindowPositionInGrid aligns the window to a 3x3 grid on the monitor with following values:<br>
   - 'top-left', 'top-center', 'top-right'<br>
@@ -273,7 +320,7 @@ Refer to [Usage Examples](#usage-examples) for practical applications.
   - `LoadWindowMetrics`, `SaveWindowMetrics`: Manage persistent window settings.
 
 - **Window State**:
-  - `ToggleFullscreen`, `ExitFullscreen`, `ToggleMaximize`, `ExitMaximize`: Control window display modes.
+  - `ToggleFullscreen`, `ExitFullscreen`, `ToggleMaximize`, `ExitMaximize`, `WindowMinimize`, `WindowRestore`: Control window display modes.
 
 <br>
 <br>

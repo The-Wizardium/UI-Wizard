@@ -3,9 +3,9 @@
 // * Description:    MyCOM Source File                                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -784,6 +784,24 @@ STDMETHODIMP MyCOM::ExitMaximize() {
 	}
 
 	UIWizard::Window()->ToggleMaximize(true);
+	return S_OK;
+}
+
+STDMETHODIMP MyCOM::WindowMinimize() {
+	if (!UIWizard::Window()) {
+		return UIWHCOM::LogError(E_UNEXPECTED, L"UI Wizard => MyCOM::WindowMinimize", L"Window not initialized");
+	}
+
+	UIWizard::Window()->HandleWindowMinimize();
+	return S_OK;
+}
+
+STDMETHODIMP MyCOM::WindowRestore() {
+	if (!UIWizard::Window()) {
+		return UIWHCOM::LogError(E_UNEXPECTED, L"UI Wizard => MyCOM::WindowRestore", L"Window not initialized");
+	}
+
+	UIWizard::Window()->HandleWindowRestore(NULL);
 	return S_OK;
 }
 #pragma endregion

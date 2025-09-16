@@ -3,9 +3,9 @@
 // * Description:    MyCOM Header File                                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -102,6 +102,8 @@ public:
 	STDMETHOD(ExitFullscreen)();
 	STDMETHOD(ToggleMaximize)();
 	STDMETHOD(ExitMaximize)();
+	STDMETHOD(WindowMinimize)();
+	STDMETHOD(WindowRestore)();
 
 private:
 	LONG refCount = 0;

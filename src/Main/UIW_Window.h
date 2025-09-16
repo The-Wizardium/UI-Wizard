@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Header File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -67,36 +67,37 @@ public:
 	void InitWindowMessageLoop() const;
 
 	HWND mainHwnd = nullptr;
+	FrameStyle savedFrameStyle = FrameStyle::Default;
 
 	std::unique_ptr<std::remove_pointer_t<HBRUSH>, decltype(&DeleteObject)> bgBrush {
-		nullptr, &DeleteObject 
+		nullptr, &DeleteObject
 	};
-	COLORREF bgColor = RGB(255, 255, 255);
+	COLORREF bgColor = RGB(240, 240, 240);
 
 	bool mouseInCaption = false;
 	bool mouseIsDragging = false;
 	POINT mouseDragStart = { 0, 0 };
 	POINT windowDragStart = { 0, 0 };
 	bool windowMinimized = false;
-	bool windowResizing = false;
 
 	static const UINT HIDE_WINDOW_INACTIVITY_TIMER_ID = 30430;
 	ULONGLONG hideWindowLastActivityTime = 0;
 	ULONGLONG hideWindowLastInputTime = 0;
 
 	// * WINDOW APPEARANCE * //
-	void SetFrameStyle(FrameStyle style, bool forceUpdate = false) const;
-	void SetAeroEffect(AeroEffect effect, bool forceUpdate = false) const;
+	void SetFrameStyle(FrameStyle style, bool forceUpdate = false);
+	void SetAeroEffect(AeroEffect effect, bool forceUpdate = false);
 	bool HandleAeroEffectDisabled(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	bool CreateWindowBgBrush();
 	COLORREF GetWindowBgColor() const;
-	LRESULT SetWindowBgColor(WPARAM wParam);
+	void SetWindowBgColor(WPARAM wParam);
 	void SetBgColor(COLORREF color);
 	LRESULT HandleWindowFrame(UINT message, WPARAM wParam, LPARAM lParam);
 	void SetCustomIcon() const;
 	bool SetTaskbarIconVisibility(bool force = false) const;
 	pfc::string8 GetWindowTitle() const;
 	void SetWindowTitle() const;
+	void SetWindows11RoundCorners() const;
 
 	// * WINDOW CONTROLS * //
 	bool CaptionArea(const POINT& pt) const;
@@ -122,6 +123,8 @@ public:
 	void SetWindowHideInactivity();
 	void HandleWindowMinimize();
 	void HandleWindowRestore(WPARAM wParam);
+	void HandleWindowState(bool wasMaximized, bool wasFullscreen, bool restoreState = false);
+	void SetFullscreenSize();
 	void ToggleFullscreen(bool forceExitFullscreen = false);
 	void ToggleMaximize(bool forceExitMaximize = false);
 	void ToggleMaximizeButtonState();

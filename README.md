@@ -81,6 +81,18 @@ form with mischievous elegance — from glass-like Aero effects to borderless de
 
 <br>
 
+## Chronicles Of The Sealed Chapter
+
+*Deep within the luminous **Sapphiraz Sanctum**, arcane scholars of **The Wizardium**
+labor to decipher the sealed passages of the **UI Wizard**, a radiant chapter in the eternal grimoire.
+Though not all pages are yet restored, each revelation refines the **Sapphire Spell**,
+weaving elegance and stability into foobar2000’s ethereal form.*
+
+The latest enchantments and mended anomalies are chronicled in the [Scrolls of the Sanctum](assets/docs/CHANGELOG.md),
+where the spell’s arcana continues to unfold.
+
+<br>
+
 ## Gather The Relics
 
 - **Conjure** [foobar2000](https://www.foobar2000.org) - The foundational altar
@@ -108,8 +120,10 @@ form with mischievous elegance — from glass-like Aero effects to borderless de
 
 ## Enhance The Arcana
 
-For detailed information on the JavaScript API, including usage examples and a complete reference of properties and methods,
-see the [API documentation](assets/docs/API.md).
+For scholars initiated in the arcane arts of JavaScript, the sacred [UI Wizard API](assets/docs/API.md)
+unveils a codex of boundless power. Within its hallowed runes lie properties and incantations,
+woven with rituals and exemplars, granting adepts dominion over foobar2000’s ethereal form
+with precision that rivals the stars of the twilight firmament.
 
 <br>
 
@@ -126,7 +140,8 @@ New Arcane Arts are ever welcome! Prove your mastery:
 
 - Peter Pawlowski for [foobar2000](https://www.foobar2000.org), the sacred canvas enchanted with Arcana —
   [oops, Peter, we did it again! 😈](https://www.youtube.com/watch?v=qItugh-fFgg)
-- Tsuda Kageyu for [MinHook](https://github.com/TsudaKageyu/minhook).
+- **[Tsuda Kageyu](https://github.com/TsudaKageyu)** for [MinHook](https://github.com/TsudaKageyu/minhook).
+- **[Majestyk](https://github.com/Fizbin99)** for unmasking eldritch flaws and guiding the Sapphire Spell’s refinement.
 
 <br>
 

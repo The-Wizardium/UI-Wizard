@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////////
 // * FB2K Component: UI Wizard                                               * //
-// * Description:    UI Wizard Window Source File                            * //
-// * Author:         TT                                                      * //
-// * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
-// * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Description: Â  Â UI Wizard Window Source File       Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â * //
+// * Author: Â  Â  Â  Â  TT Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â * //
+// * Website: Â  Â  Â  Â https://github.com/The-Wizardium/UI-Wizard Â  Â  Â       Â  * //
+// * Version: Â  Â  Â  Â 0.2.0       Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  * //
+// * Dev. started: Â  12-12-2024 Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â * //
+// * Last change: Â  Â 16-09-2025 Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â  Â * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -36,21 +36,32 @@ void UIWizardWindow::Initialize() {
 	UIWizardSettings::windowState = UIWizardSettings::windowState.get_value();
 
 	// * INIT SAFETY CHECKS * //
-	UIWHWindow::ValidateWindowPosition(mainHwnd);
-	UIWHWindow::ValidateWindowSize(mainHwnd);
-	UIWHWindow::ValidateWindowSizeConstraints(
-		UIWizardSettings::windowMinWidth, UIWizardSettings::windowMinHeight,
-		UIWizardSettings::windowMaxWidth, UIWizardSettings::windowMaxHeight
-	);
+	if (!WindowIsMaximized() && !WindowIsFullscreen()) {
+		UIWHWindow::ValidateWindowPosition(mainHwnd);
+		UIWHWindow::ValidateWindowSize(mainHwnd);
+		UIWHWindow::ValidateWindowSizeConstraints(
+			UIWizardSettings::windowMinWidth, UIWizardSettings::windowMinHeight,
+			UIWizardSettings::windowMaxWidth, UIWizardSettings::windowMaxHeight
+		);
+	}
 
 	// * INIT FRAME STYLE AND AERO EFFECT * //
 	SetFrameStyle(static_cast<FrameStyle>(UIWizardSettings::frameStyle.get_value()));
 	SetAeroEffect(static_cast<AeroEffect>(UIWizardSettings::aeroEffect.get_value()));
 
+	if (WindowIsFullscreen()) {
+		SetFullscreenSize();
+	}
+
 	// * INIT AND CREATE SHADOW WINDOW IF BORDERLESS * //
-	UIWizard::Shadow()->ShadowWindow();
-	UIWizard::Shadow()->ShadowWindowDisplay();
-	UIWizard::Shadow()->ShadowWindowUpdate();
+	if (!UIWHWindow::IsWindows11()) {
+		UIWizard::Shadow()->ShadowWindow();
+		UIWizard::Shadow()->ShadowWindowDisplay();
+		UIWizard::Shadow()->ShadowWindowUpdate();
+	}
+
+	// * INIT WINDOWS 11 ROUND CORNERS * //
+	SetWindows11RoundCorners();
 
 	// * INIT OTHER REMAINING WINDOW SETTINGS * //
 	UIWHWindow::SetWindowTransparency(mainHwnd, UIWizardSettings::windowTransparency, UIWizardSettings::enableWindowTransparency);
@@ -59,6 +70,8 @@ void UIWizardWindow::Initialize() {
 	SetTaskbarIconVisibility();
 	SetWindowHideInactivity();
 	ToggleMaximizeButtonState();
+
+	ShowWindow(mainHwnd, SW_SHOW);
 }
 
 void UIWizardWindow::InitWindowMessageLoop() const {
@@ -80,17 +93,25 @@ void UIWizardWindow::InitWindowMessageLoop() const {
 // * WINDOW APPEARANCE * //
 ///////////////////////////
 #pragma region Window Appearance
-void UIWizardWindow::SetFrameStyle(FrameStyle style, bool forceUpdate) const {
-	static FrameStyle lastFrameStyle = FrameStyle::Default;
-	if (lastFrameStyle == style && !forceUpdate) return;
+void UIWizardWindow::SetFrameStyle(FrameStyle style, bool forceUpdate) {
+	static FrameStyle frameStylePrevious = FrameStyle::Default;
+	if (frameStylePrevious == style && !forceUpdate) return;
 
-	if (UIWizardSettings::frameStyle != static_cast<int>(FrameStyle::Default) &&
-		UIWizardSettings::aeroEffect == static_cast<int>(AeroEffect::Disabled)) {
-		UIWizardSettings::frameStyle  = static_cast<int>(FrameStyle::Default);
+	// Capture states before style changes to preserve maximized/fullscreen and frameStyle status
+	bool wasMaximized = WindowIsMaximized();
+	bool wasFullscreen = WindowIsFullscreen();
+	bool frameStyleChanged = UIWizardSettings::frameStylePrevious != static_cast<int>(style);
+
+	// Exit maximized/fullscreen before changing styles to avoid DWM sizing bugs
+	if (frameStyleChanged) HandleWindowState(wasMaximized, wasFullscreen, true);
+
+	if (!UIWHWindow::IsFrameStyle("Default") && UIWHWindow::IsAeroEffect("Disabled")) {
+		UIWHWindow::SetFrameStyle("Default");
 		style = FrameStyle::Default;
 	}
 
-	lastFrameStyle = style;
+	UIWizardSettings::frameStylePrevious = static_cast<int>(style);
+	frameStylePrevious = style;
 
 	LONG_PTR styleValue = GetWindowLongPtr(mainHwnd, GWL_STYLE);
 	LONG_PTR exStyleValue = GetWindowLongPtr(mainHwnd, GWL_EXSTYLE) & ~WS_EX_TOOLWINDOW;
@@ -110,22 +131,22 @@ void UIWizardWindow::SetFrameStyle(FrameStyle style, bool forceUpdate) const {
 			break;
 		}
 		case FrameStyle::NoBorder: {
-			styleValue = WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
+			styleValue = WS_POPUP | WS_MAXIMIZEBOX | WS_MINIMIZEBOX;
 			break;
 		}
 	}
 
-	// Apply the style changes with its FrameStyle
-	SetWindowLongPtr(mainHwnd, GWL_STYLE, styleValue);
+	// Apply the frame style changes, WS_CLIPCHILDREN prevents window flicker so we do not need  return 1 in WM_ERASEBKGND
+	SetWindowLongPtr(mainHwnd, GWL_STYLE, styleValue | WS_CLIPCHILDREN);
 	SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, exStyleValue);
 
-	// Trigger a WM_SIZE message to update window size all child windows
-	SetWindowPos(mainHwnd, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+	// Restore original maximized/fullscreen state if no restoration was needed
+	if (frameStyleChanged) HandleWindowState(wasMaximized, wasFullscreen);
+
 	UpdateWindowSize();
-	ShowWindow(mainHwnd, SW_SHOW);
 }
 
-void UIWizardWindow::SetAeroEffect(AeroEffect effect, bool forceUpdate) const {
+void UIWizardWindow::SetAeroEffect(AeroEffect effect, bool forceUpdate) {
 	static AeroEffect lastAeroEffect = AeroEffect::Default;
 	if (lastAeroEffect == effect && !forceUpdate) return;
 	lastAeroEffect = effect;
@@ -149,7 +170,7 @@ void UIWizardWindow::SetAeroEffect(AeroEffect effect, bool forceUpdate) const {
 			break;
 		}
 		case AeroEffect::Disabled: {
-			UIWizardSettings::frameStyle = static_cast<int>(FrameStyle::Default);
+			UIWHWindow::SetFrameStyle("Default");
 			SetFrameStyle(FrameStyle::Default);
 			dwPolicy = DWMNCRP_DISABLED;
 			DwmSetWindowAttribute(mainHwnd, DWMWA_NCRENDERING_POLICY, &dwPolicy, sizeof(dwPolicy));
@@ -175,7 +196,7 @@ void UIWizardWindow::SetAeroEffect(AeroEffect effect, bool forceUpdate) const {
 }
 
 bool UIWizardWindow::HandleAeroEffectDisabled(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) {
-	if (UIWizardSettings::aeroEffect != static_cast<int>(AeroEffect::Disabled)) {
+	if (!UIWHWindow::IsAeroEffect("Disabled")) {
 		return false; // Aero is not disabled, nothing to do
 	}
 
@@ -187,11 +208,7 @@ bool UIWizardWindow::HandleAeroEffectDisabled(HWND hWnd, UINT message, WPARAM wP
 }
 
 LRESULT UIWizardWindow::HandleWindowFrame(UINT message, WPARAM wParam, LPARAM lParam) {
-	auto currentStyle = static_cast<FrameStyle>(
-		UIWizardSettings::frameStyle.get_value()
-		);
-
-	if (currentStyle == FrameStyle::NoBorder) {
+	if (UIWHWindow::IsFrameStyle("NoBorder")) {
 		return 0;
 	}
 
@@ -200,7 +217,7 @@ LRESULT UIWizardWindow::HandleWindowFrame(UINT message, WPARAM wParam, LPARAM lP
 
 bool UIWizardWindow::CreateWindowBgBrush() {
 	COLORREF customColor = GetWindowBgColor();
-	COLORREF defaultColor = UIWHDarkMode::IsDark() ? RGB(32, 32, 32) : RGB(255, 255, 255);
+	COLORREF defaultColor = UIWHDarkMode::IsDark() ? RGB(51, 51, 51) : RGB(240, 240, 240);
 
 	if (customColor == CLR_INVALID) customColor = defaultColor;
 	if (customColor == bgColor && bgBrush) return false;
@@ -232,14 +249,10 @@ COLORREF UIWizardWindow::GetWindowBgColor() const {
 	return RGB((colorValue >> 16) & 0xFF, (colorValue >> 8) & 0xFF, colorValue & 0xFF);
 }
 
-LRESULT UIWizardWindow::SetWindowBgColor(WPARAM wParam) {
-	if (windowResizing) {
-		RECT rect;
-		GetClientRect(mainHwnd, &rect);
-		FillRect((HDC)wParam, &rect, bgBrush.get());
-	}
-
-	return 1; // Prevents flicker when minimizing/restoring the window but only when no drawing happens!
+void UIWizardWindow::SetWindowBgColor(WPARAM wParam) {
+	RECT rect;
+	GetClientRect(mainHwnd, &rect);
+	FillRect((HDC)wParam, &rect, bgBrush.get());
 }
 
 void UIWizardWindow::SetBgColor(COLORREF color) {
@@ -316,6 +329,12 @@ void UIWizardWindow::SetWindowTitle() const {
 	if (windowTitleLen == 0 || wcscmp(wideTitle.get_ptr(), windowCurrentTitle.get_ptr()) != 0) {
 		SetWindowText(mainHwnd, wideTitle.get_ptr());
 	}
+}
+
+void UIWizardWindow::SetWindows11RoundCorners() const {
+	DWORD cornerPref = 2; // DWMWCP_ROUND, 33 = DWMWA_WINDOW_CORNER_PREFERENCE
+	DwmSetWindowAttribute(mainHwnd, 33, &cornerPref, sizeof(cornerPref));
+	DwmSetWindowAttribute(UIWizard::Shadow()->shadowHwnd, 33, &cornerPref, sizeof(cornerPref));
 }
 #pragma endregion
 
@@ -411,6 +430,10 @@ bool UIWizardWindow::DragStyle(MoveStyle moveStyle) const {
 }
 
 void UIWizardWindow::DragStart(LPARAM lParam, bool isClientCoords) {
+	if (WindowIsFullscreen()) {
+		return;
+	}
+
 	RECT rect;
 	GetWindowRect(mainHwnd, &rect);
 
@@ -446,7 +469,7 @@ void UIWizardWindow::DragSnap(int& x, int& y) {
 	int bottomBorder = windowRect.bottom - (clientTopLeft.y + clientRect.bottom);
 
 	// Adjust for borderless frame style
-	if (UIWizardSettings::frameStyle == 3) {
+	if (UIWHWindow::IsFrameStyle("NoBorder")) {
 		leftBorder = rightBorder = topBorder = bottomBorder = 0;
 	}
 
@@ -487,12 +510,24 @@ void UIWizardWindow::DragMove() {
 	POINT cursorPos;
 	GetCursorPos(&cursorPos);
 
-	int x = windowDragStart.x + (cursorPos.x - mouseDragStart.x);
-	int y = windowDragStart.y + (cursorPos.y - mouseDragStart.y);
+	int dx = cursorPos.x - mouseDragStart.x;
+	int dy = cursorPos.y - mouseDragStart.y;
+	int x = windowDragStart.x + dx;
+	int y = windowDragStart.y + dy;
 
-	if (UIWizardSettings::snapToEdge) DragSnap(x, y);
+	const int moveThreshold = 10;
+	bool noticeableMovement = (abs(dx) > moveThreshold || abs(dy) > moveThreshold);
 
-	SetWindowPos(mainHwnd, nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+	// Exit maximized window state after noticeable mouse movement (10px) drag
+	// to mimic Windows titlebar restore and avoid double-click maximize conflicts
+	if (mouseInCaption && WindowIsMaximized() && noticeableMovement) {
+		ToggleMaximize(true);
+	}
+	if (UIWizardSettings::snapToEdge) {
+		DragSnap(x, y);
+	}
+
+	SetWindowPos(mainHwnd, nullptr, x, y, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOZORDER);
 }
 
 void UIWizardWindow::DragEnd() {
@@ -505,6 +540,11 @@ void UIWizardWindow::DragEnd() {
 void UIWizardWindow::HandleESCKey() {
 	int cfgValue = UIWizardSettings::ESCKey;
 	auto action = static_cast<ESCKeyAction>(cfgValue);
+
+	if (UIWHWindow::IsWindowState("Fullscreen")) {
+		UIWizard::Window()->ToggleFullscreen(true);
+		return;
+	}
 
 	switch (action) {
 		case ESCKeyAction::None: {
@@ -523,7 +563,7 @@ void UIWizardWindow::HandleESCKey() {
 }
 
 int UIWizardWindow::HandleWindowHitTest(LPARAM lParam) {
-	if (UIWizardSettings::disableWindowSizing) {
+	if (UIWizardSettings::disableWindowSizing || WindowIsFullscreen()) {
 		return HTCLIENT;
 	}
 
@@ -610,12 +650,38 @@ void UIWizardWindow::HandleWindowSizeConstraints(WPARAM wParam, LPARAM lParam) c
 
 void UIWizardWindow::UpdateWindowSize() const {
 	// Resize the main window
-	RECT rect;
-	GetWindowRect(mainHwnd, &rect);
-	int width = rect.right - rect.left;
-	int height = rect.bottom - rect.top;
+	RECT rc;
+	MONITORINFO mi = UIWHDisplay::GetMonitorMetrics(mainHwnd);
 
-	SetWindowPos(mainHwnd, nullptr, rect.left, rect.top, width, height, SWP_NOZORDER);
+	if (WindowIsMaximized()) {
+		rc = mi.rcWork;
+		int borderWidth = GetSystemMetrics(SM_CXFRAME);  // Width of resizable border (left/right)
+		int borderHeight = GetSystemMetrics(SM_CYFRAME); // Height of resizable border (top/bottom)
+		int fixedBorderWidth = GetSystemMetrics(SM_CXBORDER);  // Width of non-resizable border
+		int fixedBorderHeight = GetSystemMetrics(SM_CYBORDER); // Height of non-resizable border
+
+		if (UIWHWindow::IsFrameStyle("SmallCaption") || UIWHWindow::IsFrameStyle("NoCaption")) {
+			SetWindowPos(mainHwnd, nullptr,
+				rc.left - (borderWidth * 2 + fixedBorderWidth), rc.top,
+				rc.right - rc.left + (borderWidth * 4 + fixedBorderWidth * 2),
+				rc.bottom - rc.top + (borderHeight * 2 + fixedBorderHeight),
+				SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER
+			);
+		}
+		else {
+			SetWindowPos(mainHwnd, nullptr,
+				rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+				SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER
+			);
+		}
+	}
+	else {
+		GetWindowRect(mainHwnd, &rc);
+		SetWindowPos(mainHwnd, nullptr,
+			rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+			SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOZORDER
+		);
+	}
 
 	// Resize all child windows
 	int childCount = UIWizard::Child()->ChildWindowTotalCount(mainHwnd);
@@ -632,6 +698,20 @@ void UIWizardWindow::UpdateWindowSize() const {
 	}
 
 	EndDeferWindowPos(hdwp);
+
+	// Force an additional minimal resize to trigger proper redraw when using Columns UI
+	if (GetModuleHandle(L"foo_ui_columns.dll")) {
+		GetWindowRect(mainHwnd, &rc);
+
+		SetWindowPos(mainHwnd, nullptr,
+			rc.left, rc.top, rc.right - rc.left + 1, rc.bottom - rc.top,
+			SWP_FRAMECHANGED | SWP_NOZORDER
+		);
+		SetWindowPos(mainHwnd, nullptr,
+			rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+			SWP_FRAMECHANGED | SWP_NOZORDER
+		);
+	}
 
 	// Force layout recalculation to update all sizes
 	GetClientRect(mainHwnd, &rcClient);
@@ -686,6 +766,8 @@ void UIWizardWindow::SetWindowHideInactivity() {
 }
 
 void UIWizardWindow::HandleWindowMinimize() {
+	UIWHWindow::SetWindowState("Minimized");
+
 	ShowWindow(UIWizard::Shadow()->shadowHwnd, SW_HIDE);
 	ShowWindow(mainHwnd, SW_MINIMIZE);
 
@@ -695,6 +777,8 @@ void UIWizardWindow::HandleWindowMinimize() {
 }
 
 void UIWizardWindow::HandleWindowRestore(WPARAM wParam) {
+	UIWHWindow::SetWindowState("Normal");
+
 	ShowWindow(UIWizard::Shadow()->shadowHwnd, SW_RESTORE);
 	UIWizard::Shadow()->ShadowWindowActiveState(wParam);
 	ShowWindow(mainHwnd, SW_RESTORE);
@@ -707,41 +791,111 @@ void UIWizardWindow::HandleWindowRestore(WPARAM wParam) {
 	}
 }
 
-void UIWizardWindow::ToggleFullscreen(bool forceExitFullscreen) {
-	const LONG windowStyle = GetWindowLong(mainHwnd, GWL_STYLE);
-
-	if (!forceExitFullscreen && UIWizardSettings::windowState == static_cast<int>(WindowState::Normal)) { // Enter fullscreen
-		UIWizardSettings::windowState = static_cast<int>(WindowState::Fullscreen);
-		MONITORINFO mi = UIWHDisplay::GetMonitorMetrics(mainHwnd);
-		SaveWindowMetrics();
-		SetWindowLong(mainHwnd, GWL_STYLE, windowStyle & ~WS_OVERLAPPEDWINDOW);
-		SetWindowPos(mainHwnd, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left + 1, mi.rcMonitor.bottom - mi.rcMonitor.top + 1, SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOOWNERZORDER);
+void UIWizardWindow::HandleWindowState(bool wasMaximized, bool wasFullscreen, bool restoreState) {
+	if (wasMaximized) {
+		// Using the original Windows maximize behavior for the top right ðŸ—– caption button
+		// or when double clicking on the title bar in an original foobar2000 main window
+		ShowWindow(mainHwnd, restoreState ? SW_RESTORE : SW_MAXIMIZE);
 	}
-	else { // Exit fullscreen
-		UIWizardSettings::windowState = static_cast<int>(WindowState::Normal);
-		SetWindowLong(mainHwnd, GWL_STYLE, windowStyle | WS_OVERLAPPEDWINDOW);
-		SetWindowPos(mainHwnd, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+	else if (wasFullscreen) {
+		// Using our own custom fullscreen resizing logic that is used for mainly for
+		// Frame style "NoBorder" with custom caption area through external UI Wizard API calls
+		ToggleFullscreen(restoreState);
+	}
+}
+
+void UIWizardWindow::SetFullscreenSize() {
+	LONG_PTR savedExStyle = GetWindowLongPtr(mainHwnd, GWL_EXSTYLE);
+	SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, savedExStyle | WS_EX_TOPMOST);
+
+	// Get current styles for AdjustWindowRectEx
+	auto style = static_cast<DWORD>(GetWindowLongPtr(mainHwnd, GWL_STYLE));
+	auto exstyle = static_cast<DWORD>(GetWindowLongPtr(mainHwnd, GWL_EXSTYLE));
+
+	MONITORINFO mi = UIWHDisplay::GetMonitorMetrics(mainHwnd);
+	int monitorWidth = mi.rcMonitor.right - mi.rcMonitor.left;
+	int monitorHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
+	RECT windowRect = { 0, 0, monitorWidth, monitorHeight };
+	AdjustWindowRectEx(&windowRect, style, FALSE, exstyle);
+
+	SetWindowPos(mainHwnd, HWND_TOPMOST,
+		mi.rcMonitor.left + windowRect.left,
+		mi.rcMonitor.top + windowRect.top,
+		windowRect.right - windowRect.left,
+		windowRect.bottom - windowRect.top,
+		SWP_NOSENDCHANGING
+		// Workaround hack bypassing WM_GETMINMAXINFO to allow resizing larger than screen res
+		// because of hidden titlebar at the top
+	);
+}
+
+void UIWizardWindow::ToggleFullscreen(bool forceExitFullscreen) {
+	static LONG_PTR savedExStyle = 0; // To restore topmost state
+
+	if (!forceExitFullscreen && !UIWHWindow::IsWindowState("Fullscreen")) {
+		bool fromMaximized = UIWHWindow::IsWindowState("Maximized");
+		if (!fromMaximized) SaveWindowMetrics();
+
+		if (fromMaximized) {
+			// Remove WS_MAXIMIZE flag to treat as "normal" (but keep current large pos/size)
+			LONG_PTR style = GetWindowLongPtr(mainHwnd, GWL_STYLE);
+			style &= ~WS_MAXIMIZE;
+			SetWindowLongPtr(mainHwnd, GWL_STYLE, style);
+
+			// Update placement showCmd to SW_NORMAL (ensures state checks see it as non-max)
+			WINDOWPLACEMENT wp = { sizeof(WINDOWPLACEMENT) };
+			GetWindowPlacement(mainHwnd, &wp);
+			wp.showCmd = SW_NORMAL;
+			SetWindowPlacement(mainHwnd, &wp);
+		}
+
+		UIWHWindow::SetWindowState("Fullscreen");
+
+		// Make topmost to cover taskbar
+		savedExStyle = GetWindowLongPtr(mainHwnd, GWL_EXSTYLE);
+		SetFullscreenSize();
+	}
+	// Exit fullscreen
+	else {
+		UIWHWindow::SetWindowState("Normal");
+		SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, savedExStyle); // Restore original exstyle (remove topmost)
+		SetWindowPos(mainHwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER
+		);
 		LoadWindowMetrics();
+		ShowWindow(mainHwnd, SW_SHOW); // Needed when changing from maximize to fullscreen to reset and correct windows state
+		ShowWindow(mainHwnd, SW_RESTORE);
 	}
 }
 
 void UIWizardWindow::ToggleMaximize(bool forceExitMaximize) {
-	if (!mouseInCaption || UIWizardSettings::disableWindowMaximizing) {
+	if (UIWizardSettings::disableWindowMaximizing) {
 		return;
 	}
 
-	if (UIWizardSettings::windowState == static_cast<int>(WindowState::Fullscreen)) {
-		ToggleFullscreen(true); // Exit fullscreen on double click if mouse is in caption area
+	// Enter maximized
+	if (!forceExitMaximize && !UIWHWindow::IsWindowState("Maximized")) {
+		bool fromFullscreen = UIWHWindow::IsWindowState("Fullscreen");
+		if (!fromFullscreen) SaveWindowMetrics();
+
+		if (fromFullscreen) {
+			// Remove WS_EX_TOPMOST to treat as "normal"
+			LONG_PTR exStyle = GetWindowLongPtr(mainHwnd, GWL_EXSTYLE);
+			SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, exStyle & ~WS_EX_TOPMOST);
+			SetWindowPos(mainHwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+				SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER
+			);
+		}
+
+		UIWHWindow::SetWindowState("Maximized");
+		ShowWindow(mainHwnd, SW_MAXIMIZE);
+		UpdateWindowSize();
 	}
-	else if (forceExitMaximize || UIWizardSettings::windowState == static_cast<int>(WindowState::Maximized)) {
-		UIWizardSettings::windowState = static_cast<int>(WindowState::Normal);
-		LoadWindowMetrics();
-	}
+	// Exit maximized
 	else {
-		UIWizardSettings::windowState = static_cast<int>(WindowState::Maximized);
-		MONITORINFO mi = UIWHDisplay::GetMonitorMetrics(mainHwnd);
-		SaveWindowMetrics();
-		SetWindowPos(mainHwnd, nullptr, mi.rcWork.left, mi.rcWork.top, mi.rcWork.right - mi.rcWork.left, mi.rcWork.bottom - mi.rcWork.top, SWP_NOZORDER | SWP_NOACTIVATE);
+		UIWHWindow::SetWindowState("Normal");
+		LoadWindowMetrics();
+		ShowWindow(mainHwnd, SW_RESTORE);
 	}
 }
 
@@ -761,14 +915,16 @@ void UIWizardWindow::ToggleMaximizeButtonState() {
 bool UIWizardWindow::WindowIsFullscreen() const {
 	RECT windowRect;
 	GetWindowRect(mainHwnd, &windowRect);
-	RECT screenRect;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &screenRect, 0);
 
-	bool fullscreen = EqualRect(&windowRect, &screenRect);
+	MONITORINFO mi = { sizeof(mi) };
+	GetMonitorInfo(MonitorFromWindow(mainHwnd, MONITOR_DEFAULTTONEAREST), &mi);
+	RECT screenRect = mi.rcMonitor;
 
-	if (fullscreen) {
-		UIWizardSettings::windowState = static_cast<int>(WindowState::Fullscreen);
-	}
+	bool isMaximized = (GetWindowLongPtr(mainHwnd, GWL_STYLE) & WS_MAXIMIZE) != 0;
+	bool fullscreen = !isMaximized && EqualRect(&windowRect, &screenRect)
+		|| UIWHWindow::IsWindowState("Fullscreen");
+
+	if (fullscreen) UIWHWindow::SetWindowState("Fullscreen");
 
 	return fullscreen;
 }
@@ -777,11 +933,11 @@ bool UIWizardWindow::WindowIsMaximized() const {
 	WINDOWPLACEMENT wp = { sizeof(WINDOWPLACEMENT) };
 	GetWindowPlacement(mainHwnd, &wp);
 
-	bool maximized = wp.showCmd == SW_MAXIMIZE;
+	bool maximized = (wp.showCmd == SW_MAXIMIZE
+		|| (GetWindowLong(mainHwnd, GWL_STYLE) & WS_MAXIMIZE))
+		|| UIWHWindow::IsWindowState("Maximized");
 
-	if (maximized) {
-		UIWizardSettings::windowState = static_cast<int>(WindowState::Maximized);
-	}
+	if (maximized) UIWHWindow::SetWindowState("Maximized");
 
 	return maximized;
 }
@@ -812,21 +968,22 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 			break;
 		}
 		case WM_ERASEBKGND: {
-			return UIWizard::Shadow()->SetWindowBgColor(wParam);
+			UIWizard::Window()->CreateWindowBgBrush();
+			UIWizard::Window()->SetWindowBgColor(wParam);
+			return 1;
+		}
+		case WM_NCACTIVATE: {
+			if (UIWHWindow::IsFrameStyle("NoBorder") || UIWHWindow::IsWindowState("Fullscreen")) {
+				return TRUE;
+			}
+			break;
 		}
 
 		// Window Mouse Events
-		case WM_ENTERSIZEMOVE: {
-			UIWizard::Window()->windowResizing = true;
-			UIWizard::Window()->CreateWindowBgBrush();
-			break;
-		}
-		case WM_EXITSIZEMOVE: {
-			UIWizard::Window()->windowResizing = false;
-			break;
-		}
 		case WM_LBUTTONDBLCLK: {
-			UIWizard::Window()->ToggleMaximize();
+			if (UIWizard::Window()->mouseInCaption) {
+				UIWizard::Window()->ToggleMaximize();
+			}
 			break;
 		}
 		case WM_LBUTTONDOWN:
@@ -853,7 +1010,7 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 			break;
 		}
 		case WM_NCHITTEST: {
-			if (UIWizardSettings::aeroEffect != static_cast<int>(AeroEffect::Disabled)) {
+			if (!UIWHWindow::IsAeroEffect("Disabled")) {
 				return UIWizard::Window()->HandleWindowHitTest(lParam);
 			}
 		}
@@ -863,14 +1020,18 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 					UIWizardMainMenu::HandleMainMenuSystemMenu();
 					break;
 				}
+				case SC_MAXIMIZE: {
+					UIWizard::Window()->ToggleMaximize();
+					break;
+				}
 				case SC_MINIMIZE: {
 					UIWizard::Window()->HandleWindowMinimize();
-					break;
+					return 0;
 				}
 				case SC_RESTORE: {
 					UIWizard::Window()->HandleWindowRestore(wParam);
 					UIWizard::Window()->HandleWindowInactivity();
-					break;
+					return 0;
 				}
 			}
 			break;
@@ -898,14 +1059,11 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 			break;
 		}
 		case WM_WINDOWPOSCHANGED: {
-			UIWizard::Window()->windowResizing = false;
 			UIWizard::Shadow()->ShadowWindowUpdate();
 			break;
 		}
 		case WM_WINDOWPOSCHANGING: {
-			if (!UIWizard::Window()->windowMinimized && UIWizardSettings::windowState == static_cast<int>(WindowState::Normal)) {
-				UIWizard::Window()->windowResizing = true;
-				UIWizard::Window()->CreateWindowBgBrush();
+			if (!UIWizard::Window()->windowMinimized && UIWHWindow::IsWindowState("Normal")) {
 				UIWizard::Shadow()->ShadowWindowUpdate();
 			}
 			break;
@@ -990,12 +1148,13 @@ LRESULT CALLBACK UIWizardChildWindow::ChildWindowProc(HWND hWnd, UINT message, W
 			UIWizard::Window()->mouseInCaption = UIWizard::Window()->CaptionArea(lastCursorPos);
 
 			constexpr int borderSize = 5;
+			bool borderTop = cursorPos.y <= borderSize;
+			bool borderBottom = cursorPos.y >= clientRect.bottom - borderSize;
+			bool borderLeft = cursorPos.x <= borderSize;
+			bool borderRight = cursorPos.x >= clientRect.right - borderSize;
 
-			if ((cursorPos.y <= borderSize) ||
-				(cursorPos.y >= clientRect.bottom - borderSize) ||
-				(cursorPos.x <= borderSize) ||
-				(cursorPos.x >= clientRect.right - borderSize)) {
-				return HTTRANSPARENT;
+			if (borderTop || borderBottom || borderLeft || borderRight) {
+				return UIWizard::Window()->WindowIsMaximized() ? HTCLIENT : HTTRANSPARENT;
 			}
 			break;
 		}
@@ -1118,8 +1277,9 @@ HWND UIWizardShadowWindow::ShadowWindow() {
 	ShadowWindowDisplay();
 
 	BOOL dwmTransitionsDisabled = TRUE;
-	DwmSetWindowAttribute(shadowHwnd, DWMWA_TRANSITIONS_FORCEDISABLED,
-		&dwmTransitionsDisabled, sizeof(dwmTransitionsDisabled));
+	DwmSetWindowAttribute(shadowHwnd,
+		DWMWA_TRANSITIONS_FORCEDISABLED, &dwmTransitionsDisabled, sizeof(dwmTransitionsDisabled)
+	);
 
 	SetClassLongPtr(shadowHwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(HOLLOW_BRUSH));
 
@@ -1127,6 +1287,10 @@ HWND UIWizardShadowWindow::ShadowWindow() {
 
 	// Set the shadow window activation state immediately after creation for full shadow effect
 	ShadowWindowActiveState(0, true);
+
+	// Explicitly activate and focus the main window
+	SetForegroundWindow(UIWizard::Window()->mainHwnd);
+	SetFocus(UIWizard::Window()->mainHwnd);
 
 	return shadowHwnd;
 }
@@ -1136,8 +1300,7 @@ void UIWizardShadowWindow::ShadowWindowActiveState(WPARAM wParam, bool forceActi
 
 	BOOL isActive =
 		forceActive || (!UIWizardSettings::enableWindowTransparency &&
-		UIWizardSettings::aeroEffect != static_cast<int>(AeroEffect::SheetOfGlass) &&
-		LOWORD(wParam) != WA_INACTIVE);
+		!UIWHWindow::IsAeroEffect("SheetOfGlass") && LOWORD(wParam) != WA_INACTIVE);
 
 	// Forward activation state to the shadow window for active/non-active shadow effect and then to main window
 	PostMessage(shadowHwnd, WM_NCACTIVATE, isActive, 0);

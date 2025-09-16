@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Source File                                   * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -21,7 +21,7 @@
 /////////////////////////
 #pragma region Component Setup
 DECLARE_COMPONENT_VERSION(
-	"UI Wizard", "0.1.0",
+	"UI Wizard", "0.2.0",
 
 	"UI Wizard \n"
 	"The Sapphire Spell Of Interface Enchantment \n"
@@ -69,15 +69,8 @@ void UIWizard::InitUIWizard() {
 	uiwMainWindow->MainWindowSubclass(mainHwnd);
 	uiwChildWindow->ChildWindowSubclass(mainHwnd);
 
-	//// * INIT AND CREATE SHADOW WINDOW IF BORDERLESS * //
-	//UIWizard::Shadow()->ShadowWindow();
-	//UIWizard::Shadow()->ShadowWindowDisplay();
-	//UIWizard::Shadow()->ShadowWindowUpdate();
-
 	uiwWindow->Initialize();
 	uiwWindow->InitWindowMessageLoop();
-
-	ShowWindow(mainHwnd, SW_SHOW);
 }
 
 void UIWizard::QuitUIWizard() {

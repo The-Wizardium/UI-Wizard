@@ -3,16 +3,17 @@
 // * Description:    UI Wizard Helpers Source File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.1.0                                                   * //
+// * Version:        0.2.0                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    01-09-2025                                              * //
+// * Last change:    16-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
 #include "UIW_PCH.h"
 #include "resource.h"
 #include "UIW_Helpers.h"
-#include <UIW.h>
+#include "UIW_Settings.h"
+#include "UIW.h"
 
 
 /////////////////////
@@ -171,6 +172,20 @@ namespace UIWHConvert {
 	double DOUBLEFromVARIANT(const VARIANT& var, double defaultValue) {
 		return (var.vt == VT_R8) ? var.dblVal : defaultValue;
 	}
+
+	CSize DialogUnitsToPixel(HWND hWnd, int dluX, int dluY) {
+		CRect rect(0, 0, dluX, dluY);
+		::MapDialogRect(hWnd, &rect);
+		return CSize(rect.Width(), rect.Height());
+	}
+
+	int PercentToPixels(double percent, int dimension) {
+		return static_cast<int>(percent * dimension);
+	}
+
+	double PixelsToPercent(int pixels, int dimension) {
+		return (dimension > 0) ? (static_cast<double>(pixels) / dimension) : 0.0;
+	}
 }
 #pragma endregion
 
@@ -251,18 +266,20 @@ namespace UIWHDarkMode {
 ////////////////////////
 #pragma region Dialog Helpers
 namespace UIWHDialog {
-	bool CreateCustomFont(CFont& font, int height, int weight, const TCHAR* faceName) {
+	bool CreateCustomFont(HWND hWnd, CFont& font, int pointSize, int weight, const TCHAR* faceName) {
 		LOGFONT lf = { 0 };
-		lf.lfHeight = height;
+
+		CSize fontSize = UIWHConvert::DialogUnitsToPixel(hWnd, 0, pointSize);
+		lf.lfHeight = -fontSize.cy;
 		lf.lfWeight = weight;
 		_tcscpy_s(lf.lfFaceName, LF_FACESIZE, faceName);
 
 		if (!font.CreateFontIndirect(&lf)) { // Fallback to system font
 			_tcscpy_s(lf.lfFaceName, LF_FACESIZE, _T("MS Shell Dlg"));
 
-			HDC hdc = GetDC(nullptr);
-			lf.lfHeight = -MulDiv(8, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-			ReleaseDC(nullptr, hdc);
+			fontSize = UIWHConvert::DialogUnitsToPixel(hWnd, 0, 8);
+			lf.lfHeight = -fontSize.cy;
+			lf.lfWeight = FW_NORMAL;
 
 			return font.CreateFontIndirect(&lf);
 		}
@@ -546,6 +563,81 @@ namespace UIWHGraphics {
 ////////////////////////
 #pragma region Window Helpers
 namespace UIWHWindow {
+	bool IsWindows11() {
+		OSVERSIONINFOEXW osvi = { 0 };
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
+		osvi.dwMajorVersion = 10;
+		osvi.dwMinorVersion = 0;
+		osvi.dwBuildNumber = 22000; // Windows 11 threshold
+
+		DWORDLONG conditionMask = 0;
+		VER_SET_CONDITION(conditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+		VER_SET_CONDITION(conditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
+		VER_SET_CONDITION(conditionMask, VER_BUILDNUMBER, VER_GREATER_EQUAL);
+
+		return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, conditionMask) != FALSE;
+	}
+
+	bool IsFrameStyle(std::string_view style) {
+		int expectedState = 0;
+
+		if (style == "Default") expectedState = 0;
+		else if (style == "SmallCaption") expectedState = 1;
+		else if (style == "NoCaption") expectedState = 2;
+		else if (style == "NoBorder") expectedState = 3;
+		else expectedState = 0;
+
+		return UIWizardSettings::frameStyle == expectedState;
+	}
+
+	void SetFrameStyle(std::string_view style) {
+		if (style == "Default") UIWizardSettings::frameStyle = 0;
+		else if (style == "SmallCaption") UIWizardSettings::frameStyle = 1;
+		else if (style == "NoCaption") UIWizardSettings::frameStyle = 2;
+		else if (style == "NoBorder") UIWizardSettings::frameStyle = 3;
+		else UIWizardSettings::frameStyle = 0;
+	}
+
+	bool IsAeroEffect(std::string_view effect) {
+		int expectedState = 0;
+
+		if (effect == "Default") expectedState = 0;
+		else if (effect == "Disabled") expectedState = 1;
+		else if (effect == "GlassFrame") expectedState = 2;
+		else if (effect == "SheetOfGlass") expectedState = 3;
+		else expectedState = 0;
+
+		return UIWizardSettings::aeroEffect == expectedState;
+	}
+
+	void SetAeroEffect(std::string_view effect) {
+		if (effect == "Default") UIWizardSettings::aeroEffect = 0;
+		else if (effect == "Disabled") UIWizardSettings::aeroEffect = 1;
+		else if (effect == "GlassFrame") UIWizardSettings::aeroEffect = 2;
+		else if (effect == "SheetOfGlass") UIWizardSettings::aeroEffect = 3;
+		else UIWizardSettings::aeroEffect = 0;
+	}
+
+	bool IsWindowState(std::string_view state) {
+		int expectedState = 0;
+
+		if (state == "Normal") expectedState = 0;
+		else if (state == "Minimized") expectedState = 1;
+		else if (state == "Maximized") expectedState = 2;
+		else if (state == "Fullscreen") expectedState = 3;
+		else expectedState = 0;
+
+		return UIWizardSettings::windowState == expectedState;
+	}
+
+	void SetWindowState(std::string_view state) {
+		if (state == "Normal") UIWizardSettings::windowState = 0;
+		else if (state == "Minimized") UIWizardSettings::windowState = 1;
+		else if (state == "Maximized") UIWizardSettings::windowState = 2;
+		else if (state == "Fullscreen") UIWizardSettings::windowState = 3;
+		else UIWizardSettings::windowState = 0;
+	}
+
 	int GetWindowX(HWND hWnd) {
 		RECT rect;
 		return GetWindowRect(hWnd, &rect) ? rect.left : -1;
@@ -564,6 +656,41 @@ namespace UIWHWindow {
 	int GetWindowHeight(HWND hWnd) {
 		RECT rect;
 		return GetWindowRect(hWnd, &rect) ? rect.bottom - rect.top : -1;
+	}
+
+	int GetWindowTitlebarHeight(HWND hWnd) {
+		LONG_PTR style = GetWindowLongPtr(hWnd, GWL_STYLE);
+		LONG_PTR exstyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+
+		// Get DPI-aware metrics
+		int caption_height = 0;
+		int frame_top = 0;
+
+		if (IsFrameStyle("Default")) {
+			caption_height = GetSystemMetrics(SM_CYCAPTION);  // Standard titlebar
+			if (style & WS_THICKFRAME) {
+				frame_top = GetSystemMetrics(SM_CYFRAME);  // Resizable top frame
+			}
+		}
+		else if (IsFrameStyle("SmallCaption")) {
+			caption_height = GetSystemMetrics(SM_CYSMCAPTION);  // Small titlebar
+			if (style & WS_THICKFRAME) {
+				frame_top = GetSystemMetrics(SM_CYFRAME);
+			}
+		}
+		else if (IsFrameStyle("NoCaption")) {
+			caption_height = 0;  // No titlebar
+			if (style & WS_THICKFRAME) {
+				frame_top = GetSystemMetrics(SM_CYFRAME);
+			}
+		}
+		else if (IsFrameStyle("NoBorder")) {
+			caption_height = 0;
+			frame_top = 0;  // No non-client area
+		}
+
+		// Total top non-client height (caption + top frame)
+		return caption_height + frame_top;
 	}
 
 	void SetWindowPosition(HWND hWnd, int x, int y) {
@@ -632,13 +759,18 @@ namespace UIWHWindow {
 		SetWindowPos(hWnd, nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	}
 
-	void ValidateWindowPosition(HWND hWnd, const std::string& resetPosition) {
+	void ValidateWindowPosition(HWND hWnd, const std::string& resetPosition, int bufferPx) {
 		MONITORINFO mi = UIWHDisplay::GetMonitorMetrics(hWnd);
 		RECT windowRect;
 		GetWindowRect(hWnd, &windowRect);
 
-		if (windowRect.left  < mi.rcWork.left  || windowRect.top    < mi.rcWork.top ||
-			windowRect.right > mi.rcWork.right || windowRect.bottom > mi.rcWork.bottom) {
+		LONG leftBound = mi.rcMonitor.left + bufferPx;
+		LONG topBound = mi.rcMonitor.top + bufferPx;
+		LONG rightBound = mi.rcMonitor.right - bufferPx;
+		LONG bottomBound = mi.rcMonitor.bottom - bufferPx;
+
+		if (windowRect.left < leftBound || windowRect.top < topBound ||
+			windowRect.right > rightBound || windowRect.bottom > bottomBound) {
 			UIWHWindow::SetWindowPositionInGrid(hWnd, resetPosition);
 		}
 	}
