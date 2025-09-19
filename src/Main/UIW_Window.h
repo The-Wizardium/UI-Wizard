@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Header File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.0                                                   * //
+// * Version:        0.2.1                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -122,11 +122,12 @@ public:
 	void HandleWindowInactivity(bool fromTimer = false);
 	void SetWindowHideInactivity();
 	void HandleWindowMinimize();
+	void HandleWindowMaximize(LPARAM lParam) const;
 	void HandleWindowRestore(WPARAM wParam);
-	void HandleWindowState(bool wasMaximized, bool wasFullscreen, bool restoreState = false);
+	void HandleWindowState(std::string_view windowState, bool enterState = false);
 	void SetFullscreenSize();
-	void ToggleFullscreen(bool forceExitFullscreen = false);
-	void ToggleMaximize(bool forceExitMaximize = false);
+	void ToggleFullscreen(bool forceEnterFullscreen = false);
+	void ToggleMaximize(bool forceEnterMaximize = false);
 	void ToggleMaximizeButtonState();
 	bool WindowIsFullscreen() const;
 	bool WindowIsMaximized() const;

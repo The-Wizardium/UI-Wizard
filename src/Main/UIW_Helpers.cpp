@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Helpers Source File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.0                                                   * //
+// * Version:        0.2.1                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -628,6 +628,18 @@ namespace UIWHWindow {
 		else expectedState = 0;
 
 		return UIWizardSettings::windowState == expectedState;
+	}
+
+	std::string_view GetWindowState(bool previousState) {
+		int state = previousState
+			? UIWizardSettings::windowStatePrevious.get_value()
+			: UIWizardSettings::windowState.get_value();
+
+		if (state == 0) return "Normal";
+		else if (state == 1) return "Minimized";
+		else if (state == 2) return "Maximized";
+		else if (state == 3) return "Fullscreen";
+		else return "Normal";
 	}
 
 	void SetWindowState(std::string_view state) {

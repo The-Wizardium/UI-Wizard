@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.0                                                   * //
+// * Version:        0.2.1                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -98,12 +98,11 @@ void UIWizardWindow::SetFrameStyle(FrameStyle style, bool forceUpdate) {
 	if (frameStylePrevious == style && !forceUpdate) return;
 
 	// Capture states before style changes to preserve maximized/fullscreen and frameStyle status
-	bool wasMaximized = WindowIsMaximized();
-	bool wasFullscreen = WindowIsFullscreen();
+	std::string_view windowStateCurrent = UIWHWindow::GetWindowState();
 	bool frameStyleChanged = UIWizardSettings::frameStylePrevious != static_cast<int>(style);
 
 	// Exit maximized/fullscreen before changing styles to avoid DWM sizing bugs
-	if (frameStyleChanged) HandleWindowState(wasMaximized, wasFullscreen, true);
+	if (frameStyleChanged) HandleWindowState(windowStateCurrent);
 
 	if (!UIWHWindow::IsFrameStyle("Default") && UIWHWindow::IsAeroEffect("Disabled")) {
 		UIWHWindow::SetFrameStyle("Default");
@@ -141,7 +140,7 @@ void UIWizardWindow::SetFrameStyle(FrameStyle style, bool forceUpdate) {
 	SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, exStyleValue);
 
 	// Restore original maximized/fullscreen state if no restoration was needed
-	if (frameStyleChanged) HandleWindowState(wasMaximized, wasFullscreen);
+	if (frameStyleChanged) HandleWindowState(windowStateCurrent, true);
 
 	UpdateWindowSize();
 }
@@ -521,8 +520,45 @@ void UIWizardWindow::DragMove() {
 	// Exit maximized window state after noticeable mouse movement (10px) drag
 	// to mimic Windows titlebar restore and avoid double-click maximize conflicts
 	if (mouseInCaption && WindowIsMaximized() && noticeableMovement) {
-		ToggleMaximize(true);
+		// Capture old (maximized) rect before restore
+		RECT oldRect;
+		GetWindowRect(mainHwnd, &oldRect);
+		double oldWidth = static_cast<double>(oldRect.right) - oldRect.left;
+		double oldHeight = static_cast<double>(oldRect.bottom) - oldRect.top;
+
+		// Calculate proportional relative click position
+		double relX = (static_cast<double>(mouseDragStart.x) - oldRect.left) / oldWidth;
+		double relY = (static_cast<double>(mouseDragStart.y) - oldRect.top) / oldHeight;
+
+		ToggleMaximize();
+
+		// Get new (restored) rect after toggle
+		RECT newRect;
+		GetWindowRect(mainHwnd, &newRect);
+		int newWidth = newRect.right - newRect.left;
+		int newHeight = newRect.bottom - newRect.top;
+
+		// Recompute absolute relative position based on new dimensions
+		auto newX = std::clamp(static_cast<int>(relX * newWidth + 0.5), 0, newWidth);
+		auto newY = std::clamp(static_cast<int>(relY * newHeight + 0.5), 0, newHeight);
+
+		// Reposition window to keep cursor at proportional relative position post-restore
+		int correctX = cursorPos.x - newX;
+		int correctY = cursorPos.y - newY;
+		SetWindowPos(mainHwnd, nullptr, correctX, correctY, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOZORDER);
+
+		// Update drag reference points to the post-restore state
+		windowDragStart.x = correctX;
+		windowDragStart.y = correctY;
+		mouseDragStart = cursorPos;
+
+		// Recalculate dx, dy, x, y with updated references
+		dx = cursorPos.x - mouseDragStart.x;
+		dy = cursorPos.y - mouseDragStart.y;
+		x = windowDragStart.x + dx;
+		y = windowDragStart.y + dy;
 	}
+
 	if (UIWizardSettings::snapToEdge) {
 		DragSnap(x, y);
 	}
@@ -542,7 +578,7 @@ void UIWizardWindow::HandleESCKey() {
 	auto action = static_cast<ESCKeyAction>(cfgValue);
 
 	if (UIWHWindow::IsWindowState("Fullscreen")) {
-		UIWizard::Window()->ToggleFullscreen(true);
+		UIWizard::Window()->ToggleFullscreen();
 		return;
 	}
 
@@ -604,11 +640,13 @@ int UIWizardWindow::HandleWindowHitTest(LPARAM lParam) {
 ///////////////////////////////
 #pragma region Window Size
 void UIWizardWindow::LoadWindowMetrics() const {
+	if (!UIWHWindow::IsWindowState("Normal")) return;
 	UIWizardSettings::windowPosition.apply_to_window(mainHwnd, true);
 	UIWizardSettings::windowSize.apply_to_window(mainHwnd);
 }
 
 void UIWizardWindow::SaveWindowMetrics() const {
+	if (!UIWHWindow::IsWindowState("Normal")) return;
 	UIWizardSettings::windowPosition.read_from_window(mainHwnd);
 	UIWizardSettings::windowSize.read_from_window(mainHwnd);
 }
@@ -766,6 +804,7 @@ void UIWizardWindow::SetWindowHideInactivity() {
 }
 
 void UIWizardWindow::HandleWindowMinimize() {
+	UIWizardSettings::windowStatePrevious = UIWizardSettings::windowState;
 	UIWHWindow::SetWindowState("Minimized");
 
 	ShowWindow(UIWizard::Shadow()->shadowHwnd, SW_HIDE);
@@ -776,8 +815,29 @@ void UIWizardWindow::HandleWindowMinimize() {
 	}
 }
 
+void UIWizardWindow::HandleWindowMaximize(LPARAM lParam) const {
+	// Handle WM_GETMINMAXINFO for NoBorder (WS_POPUP) frame style to prevent
+	// maximization to the full monitor rect (including taskbar), which causes a visible glitch.
+	// Instead, constrain to the work area (excluding taskbar) to mimic WS_OVERLAPPEDWINDOW behavior.
+	if (!UIWHWindow::IsFrameStyle("NoBorder")) return;
+
+	auto pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+	MONITORINFO mi = UIWHDisplay::GetMonitorMetrics(mainHwnd);
+	RECT rcWork = mi.rcWork;
+
+	// Set max position to work area top-left and max size to work area dimensions.
+	pmmi->ptMaxPosition.x = rcWork.left;
+	pmmi->ptMaxPosition.y = rcWork.top;
+	pmmi->ptMaxSize.x = rcWork.right - rcWork.left;
+	pmmi->ptMaxSize.y = rcWork.bottom - rcWork.top;
+
+	// Prevent dragging beyond work area if resizable.
+	pmmi->ptMaxTrackSize.x = pmmi->ptMaxSize.x;
+	pmmi->ptMaxTrackSize.y = pmmi->ptMaxSize.y;
+}
+
 void UIWizardWindow::HandleWindowRestore(WPARAM wParam) {
-	UIWHWindow::SetWindowState("Normal");
+	UIWHWindow::SetWindowState(UIWHWindow::GetWindowState(true));
 
 	ShowWindow(UIWizard::Shadow()->shadowHwnd, SW_RESTORE);
 	UIWizard::Shadow()->ShadowWindowActiveState(wParam);
@@ -791,16 +851,17 @@ void UIWizardWindow::HandleWindowRestore(WPARAM wParam) {
 	}
 }
 
-void UIWizardWindow::HandleWindowState(bool wasMaximized, bool wasFullscreen, bool restoreState) {
-	if (wasMaximized) {
-		// Using the original Windows maximize behavior for the top right 🗖 caption button
-		// or when double clicking on the title bar in an original foobar2000 main window
-		ShowWindow(mainHwnd, restoreState ? SW_RESTORE : SW_MAXIMIZE);
+void UIWizardWindow::HandleWindowState(std::string_view windowState, bool enterState) {
+	if (windowState == "Fullscreen") {
+		ToggleFullscreen(enterState);
 	}
-	else if (wasFullscreen) {
-		// Using our own custom fullscreen resizing logic that is used for mainly for
-		// Frame style "NoBorder" with custom caption area through external UI Wizard API calls
-		ToggleFullscreen(restoreState);
+	else if (windowState == "Maximized") {
+		ToggleMaximize(enterState);
+	}
+	else if (!enterState) {
+		UIWHWindow::SetWindowState("Normal");
+		LoadWindowMetrics();
+		ShowWindow(mainHwnd, SW_RESTORE);
 	}
 }
 
@@ -829,14 +890,14 @@ void UIWizardWindow::SetFullscreenSize() {
 	);
 }
 
-void UIWizardWindow::ToggleFullscreen(bool forceExitFullscreen) {
+void UIWizardWindow::ToggleFullscreen(bool forceEnterFullscreen) {
 	static LONG_PTR savedExStyle = 0; // To restore topmost state
 
-	if (!forceExitFullscreen && !UIWHWindow::IsWindowState("Fullscreen")) {
-		bool fromMaximized = UIWHWindow::IsWindowState("Maximized");
-		if (!fromMaximized) SaveWindowMetrics();
+	// Enter fullscreen
+	if (forceEnterFullscreen || !UIWHWindow::IsWindowState("Fullscreen")) {
+		SaveWindowMetrics();
 
-		if (fromMaximized) {
+		if (UIWHWindow::IsWindowState("Maximized")) {
 			// Remove WS_MAXIMIZE flag to treat as "normal" (but keep current large pos/size)
 			LONG_PTR style = GetWindowLongPtr(mainHwnd, GWL_STYLE);
 			style &= ~WS_MAXIMIZE;
@@ -868,17 +929,16 @@ void UIWizardWindow::ToggleFullscreen(bool forceExitFullscreen) {
 	}
 }
 
-void UIWizardWindow::ToggleMaximize(bool forceExitMaximize) {
+void UIWizardWindow::ToggleMaximize(bool forceEnterMaximize) {
 	if (UIWizardSettings::disableWindowMaximizing) {
 		return;
 	}
 
 	// Enter maximized
-	if (!forceExitMaximize && !UIWHWindow::IsWindowState("Maximized")) {
-		bool fromFullscreen = UIWHWindow::IsWindowState("Fullscreen");
-		if (!fromFullscreen) SaveWindowMetrics();
+	if (forceEnterMaximize || !UIWHWindow::IsWindowState("Maximized")) {
+		SaveWindowMetrics();
 
-		if (fromFullscreen) {
+		if (UIWHWindow::IsWindowState("Fullscreen")) {
 			// Remove WS_EX_TOPMOST to treat as "normal"
 			LONG_PTR exStyle = GetWindowLongPtr(mainHwnd, GWL_EXSTYLE);
 			SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, exStyle & ~WS_EX_TOPMOST);
@@ -1021,7 +1081,7 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 					break;
 				}
 				case SC_MAXIMIZE: {
-					UIWizard::Window()->ToggleMaximize();
+					UIWizard::Window()->ToggleMaximize(true);
 					break;
 				}
 				case SC_MINIMIZE: {
@@ -1045,6 +1105,10 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 		}
 
 		// Window Position and Sizing
+		case WM_GETMINMAXINFO: {
+			UIWizard::Window()->HandleWindowMaximize(lParam);
+			return 0;
+		}
 		case WM_NCCALCSIZE: {
 			return UIWizard::Window()->HandleWindowFrame(message, wParam, lParam);
 		}

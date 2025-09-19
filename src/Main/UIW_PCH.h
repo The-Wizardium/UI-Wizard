@@ -3,7 +3,7 @@
 // * Description:    UI Wizard Precompiled Header File                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.0                                                   * //
+// * Version:        0.2.1                                                   * //
 // * Dev. started:   12-12-2024                                              * //
 // * Last change:    01-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////

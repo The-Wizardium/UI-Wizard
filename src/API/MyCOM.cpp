@@ -3,9 +3,9 @@
 // * Description:    MyCOM Source File                                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.0                                                   * //
+// * Version:        0.2.1                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -765,7 +765,7 @@ STDMETHODIMP MyCOM::ExitFullscreen() {
 		return UIWHCOM::LogError(E_UNEXPECTED, L"UI Wizard => MyCOM::ExitFullscreen", L"Window not initialized");
 	}
 
-	UIWizard::Window()->ToggleFullscreen(true);
+	UIWizard::Window()->ToggleFullscreen();
 	return S_OK;
 }
 
@@ -783,7 +783,7 @@ STDMETHODIMP MyCOM::ExitMaximize() {
 		return UIWHCOM::LogError(E_UNEXPECTED, L"UI Wizard => MyCOM::ExitMaximize", L"Window not initialized");
 	}
 
-	UIWizard::Window()->ToggleMaximize(true);
+	UIWizard::Window()->ToggleMaximize();
 	return S_OK;
 }
 

@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Helpers Header File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.0                                                   * //
+// * Version:        0.2.1                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -183,6 +183,7 @@ namespace UIWHWindow {
 	bool IsFrameStyle(std::string_view style);
 	void SetFrameStyle(std::string_view style);
 	bool IsWindowState(std::string_view state);
+	std::string_view GetWindowState(bool previousState = false);
 	void SetWindowState(std::string_view state);
 
 	int GetWindowX(HWND hWnd);

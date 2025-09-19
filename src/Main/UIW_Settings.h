@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Settings Header File                          * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.0                                                   * //
+// * Version:        0.2.1                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -28,6 +28,7 @@ public:
 	static constexpr GUID guid_windowPosition = { 0xb14cf675, 0xc98c, 0x435e, { 0x8d, 0x2, 0xce, 0xb0, 0xf2, 0x77, 0xe9, 0x2a } };
 	static constexpr GUID guid_windowSize = { 0xae506149, 0x18fe, 0x4752, { 0xa8, 0xf0, 0xdd, 0x86, 0xed, 0x2c, 0xf1, 0xbb } };
 	static constexpr GUID guid_windowState = { 0x9d95b8e2, 0x380d, 0x4a7f, { 0xbc, 0xc0, 0x63, 0x6f, 0xac, 0xfa, 0x1c, 0xc5 } };
+	static constexpr GUID guid_windowStatePrevious = { 0x866daf88, 0x47a, 0x4660, { 0xbf, 0x43, 0x18, 0xa5, 0x77, 0x6e, 0xdf, 0x55 } };
 
 	static constexpr GUID guid_frameStylePrevious = { 0x91ef356f, 0x8a16, 0x405e, { 0x9b, 0xd7, 0x8e, 0x15, 0xa3, 0x53, 0x91, 0x2e } };
 	static constexpr GUID guid_frameStyle = { 0x1a2b3c4d, 0x5e6f, 0x7a8b, { 0x9c, 0xd1, 0xe2, 0xf3, 0x45, 0x67, 0x89, 0xab } };
@@ -87,6 +88,7 @@ public:
 
 	static constexpr int windowBgColorDefault = -1;
 	static constexpr int windowStateDefault = 0;
+	static constexpr int windowStatePreviousDefault = 0;
 
 	static constexpr int frameStylePreviousDefault = 0;
 	static constexpr int frameStyleDefault = 0;
@@ -148,6 +150,7 @@ public:
 	static inline cfg_window_placement windowPosition{ guid_windowPosition };
 	static inline cfg_window_size windowSize{ guid_windowSize };
 	static inline cfg_int windowState{ guid_windowState, windowStateDefault };
+	static inline cfg_int windowStatePrevious{ guid_windowStatePrevious, windowStatePreviousDefault };
 
 	static inline cfg_int frameStylePrevious{ guid_frameStylePrevious, frameStylePreviousDefault };
 	static inline cfg_int frameStyle{ guid_frameStyle, frameStyleDefault };

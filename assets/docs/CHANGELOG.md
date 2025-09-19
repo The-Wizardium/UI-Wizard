@@ -42,6 +42,19 @@ weaving elegance and stability into foobar2000’s ethereal form.*
 <br>
 <br>
 
+## Version 0.2.1 - 19-09-2025
+This release is a hotfix for "NoBorder" window maximization issues.
+
+<br>
+
+### Fixed:
+- Fixed window restore issue in maximized state for "NoBorder" frame style.
+- Fixed cosmetic fullscreen glitch during window maximization with "NoBorder" frame style.
+- Fixed position offset issue when dragging a maximized window with "NoBorder" frame style.
+
+<br>
+<br>
+
 ## Version 0.2.0 - 16-09-2025
 This release enhances fullscreen support, improves Windows 11 compatibility, and fixes several window management issues.
 
