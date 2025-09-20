@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.1                                                   * //
+// * Version:        0.2.2                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    19-09-2025                                              * //
+// * Last change:    20-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -331,9 +331,17 @@ void UIWizardWindow::SetWindowTitle() const {
 }
 
 void UIWizardWindow::SetWindows11RoundCorners() const {
-	DWORD cornerPref = 2; // DWMWCP_ROUND, 33 = DWMWA_WINDOW_CORNER_PREFERENCE
-	DwmSetWindowAttribute(mainHwnd, 33, &cornerPref, sizeof(cornerPref));
-	DwmSetWindowAttribute(UIWizard::Shadow()->shadowHwnd, 33, &cornerPref, sizeof(cornerPref));
+	if (!UIWHWindow::IsWindows11()) return;
+
+	constexpr DWORD DWMWCP_DONOTROUND = 1;
+	constexpr DWORD DWMWCP_ROUND = 2;
+	constexpr DWORD DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+
+	// Disable rounding for fullscreen/maximized to eliminate edge gaps, enable for normal window state
+	bool windowNotNormal = (WindowIsFullscreen() || WindowIsMaximized());
+	DWORD cornerPref = windowNotNormal ? DWMWCP_DONOTROUND : DWMWCP_ROUND;
+
+	DwmSetWindowAttribute(mainHwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &cornerPref, sizeof(cornerPref));
 }
 #pragma endregion
 
@@ -914,16 +922,20 @@ void UIWizardWindow::ToggleFullscreen(bool forceEnterFullscreen) {
 
 		// Make topmost to cover taskbar
 		savedExStyle = GetWindowLongPtr(mainHwnd, GWL_EXSTYLE);
+		SetWindows11RoundCorners();
 		SetFullscreenSize();
 	}
 	// Exit fullscreen
 	else {
 		UIWHWindow::SetWindowState("Normal");
+
 		SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, savedExStyle); // Restore original exstyle (remove topmost)
 		SetWindowPos(mainHwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
 			SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER
 		);
 		LoadWindowMetrics();
+		SetWindows11RoundCorners();
+
 		ShowWindow(mainHwnd, SW_SHOW); // Needed when changing from maximize to fullscreen to reset and correct windows state
 		ShowWindow(mainHwnd, SW_RESTORE);
 	}
@@ -948,6 +960,7 @@ void UIWizardWindow::ToggleMaximize(bool forceEnterMaximize) {
 		}
 
 		UIWHWindow::SetWindowState("Maximized");
+		SetWindows11RoundCorners();
 		ShowWindow(mainHwnd, SW_MAXIMIZE);
 		UpdateWindowSize();
 	}
@@ -955,6 +968,7 @@ void UIWizardWindow::ToggleMaximize(bool forceEnterMaximize) {
 	else {
 		UIWHWindow::SetWindowState("Normal");
 		LoadWindowMetrics();
+		SetWindows11RoundCorners();
 		ShowWindow(mainHwnd, SW_RESTORE);
 	}
 }

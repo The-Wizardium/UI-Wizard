@@ -42,6 +42,19 @@ weaving elegance and stability into foobar2000’s ethereal form.*
 <br>
 <br>
 
+## Version 0.2.2 - 20-09-2025
+This release is a hotfix addressing a Windows 11-specific issue with rounded corners
+causing gaps in maximized and fullscreen window states.
+
+<br>
+
+### Fixed:
+- Fixed 2px gaps at monitor edges in maximized and fullscreen modes on Windows 11,
+  where rounded window corners prevented the window from reaching full edge-to-edge coverage.
+
+<br>
+<br>
+
 ## Version 0.2.1 - 19-09-2025
 This release is a hotfix for "NoBorder" window maximization issues.
 
