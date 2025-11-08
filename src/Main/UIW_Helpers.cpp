@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Helpers Source File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.2                                                   * //
+// * Version:        0.2.3                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    19-09-2025                                              * //
+// * Last change:    08-11-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -622,9 +622,8 @@ namespace UIWHWindow {
 		int expectedState = 0;
 
 		if (state == "Normal") expectedState = 0;
-		else if (state == "Minimized") expectedState = 1;
-		else if (state == "Maximized") expectedState = 2;
-		else if (state == "Fullscreen") expectedState = 3;
+		else if (state == "Maximized") expectedState = 1;
+		else if (state == "Fullscreen") expectedState = 2;
 		else expectedState = 0;
 
 		return UIWizardSettings::windowState == expectedState;
@@ -636,17 +635,15 @@ namespace UIWHWindow {
 			: UIWizardSettings::windowState.get_value();
 
 		if (state == 0) return "Normal";
-		else if (state == 1) return "Minimized";
-		else if (state == 2) return "Maximized";
-		else if (state == 3) return "Fullscreen";
+		else if (state == 1) return "Maximized";
+		else if (state == 2) return "Fullscreen";
 		else return "Normal";
 	}
 
 	void SetWindowState(std::string_view state) {
 		if (state == "Normal") UIWizardSettings::windowState = 0;
-		else if (state == "Minimized") UIWizardSettings::windowState = 1;
-		else if (state == "Maximized") UIWizardSettings::windowState = 2;
-		else if (state == "Fullscreen") UIWizardSettings::windowState = 3;
+		else if (state == "Maximized") UIWizardSettings::windowState = 1;
+		else if (state == "Fullscreen") UIWizardSettings::windowState = 2;
 		else UIWizardSettings::windowState = 0;
 	}
 

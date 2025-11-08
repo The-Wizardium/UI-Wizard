@@ -3,7 +3,7 @@
 // * Description:    UI Wizard Settings Source File                          * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.2                                                   * //
+// * Version:        0.2.3                                                   * //
 // * Dev. started:   12-12-2024                                              * //
 // * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////

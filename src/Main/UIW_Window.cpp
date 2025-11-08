@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.2                                                   * //
+// * Version:        0.2.3                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    20-09-2025                                              * //
+// * Last change:    08-11-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -364,6 +364,10 @@ bool UIWizardWindow::CaptionArea(const POINT& pt) const {
 void UIWizardWindow::CaptionAreaIndicator() {
 	if (!mainHwnd) return;
 
+	// Temporarily disable WS_CLIPCHILDREN to allow drawing over children
+	LONG_PTR style = GetWindowLongPtr(mainHwnd, GWL_STYLE);
+	SetWindowLongPtr(mainHwnd, GWL_STYLE, style & ~WS_CLIPCHILDREN);
+
 	// Clear last indicator
 	UIWHGraphics::WindowRepaint(mainHwnd);
 
@@ -392,6 +396,11 @@ void UIWizardWindow::CaptionAreaIndicatorTimer(UINT_PTR nIDEvent) {
 	if (nIDEvent != 123) return;
 
 	KillTimer(mainHwnd, 123);
+
+	// Restore WS_CLIPCHILDREN
+	LONG_PTR style = GetWindowLongPtr(mainHwnd, GWL_STYLE);
+	SetWindowLongPtr(mainHwnd, GWL_STYLE, style | WS_CLIPCHILDREN);
+
 	UIWHGraphics::WindowRepaint(mainHwnd);
 }
 
@@ -811,6 +820,21 @@ void UIWizardWindow::SetWindowHideInactivity() {
 	SetTimer(mainHwnd, HIDE_WINDOW_INACTIVITY_TIMER_ID, inactivityThreshold, nullptr);
 }
 
+void UIWizardWindow::HandleWindowFullscreenActiveState(WPARAM wParam) {
+	if (!UIWHWindow::IsWindowState("Fullscreen")) return;
+
+	LONG_PTR exStyle = GetWindowLongPtr(mainHwnd, GWL_EXSTYLE);
+
+	if (LOWORD(wParam) != WA_INACTIVE && (exStyle & WS_EX_TOPMOST) == 0) {
+		SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, exStyle | WS_EX_TOPMOST);
+		SetWindowPos(mainHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+	}
+	else if (exStyle & WS_EX_TOPMOST) {
+		SetWindowLongPtr(mainHwnd, GWL_EXSTYLE, exStyle & ~WS_EX_TOPMOST);
+		SetWindowPos(mainHwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+	}
+}
+
 void UIWizardWindow::HandleWindowMinimize() {
 	UIWizardSettings::windowStatePrevious = UIWizardSettings::windowState;
 	UIWHWindow::SetWindowState("Minimized");
@@ -898,11 +922,11 @@ void UIWizardWindow::SetFullscreenSize() {
 	);
 }
 
-void UIWizardWindow::ToggleFullscreen(bool forceEnterFullscreen) {
+void UIWizardWindow::ToggleFullscreen(bool forceEnterFullscreen, bool forceExitFullscreen) {
 	static LONG_PTR savedExStyle = 0; // To restore topmost state
 
 	// Enter fullscreen
-	if (forceEnterFullscreen || !UIWHWindow::IsWindowState("Fullscreen")) {
+	if (forceEnterFullscreen || !forceExitFullscreen && !UIWHWindow::IsWindowState("Fullscreen")) {
 		SaveWindowMetrics();
 
 		if (UIWHWindow::IsWindowState("Maximized")) {
@@ -941,13 +965,13 @@ void UIWizardWindow::ToggleFullscreen(bool forceEnterFullscreen) {
 	}
 }
 
-void UIWizardWindow::ToggleMaximize(bool forceEnterMaximize) {
+void UIWizardWindow::ToggleMaximize(bool forceEnterMaximize, bool forceExitMaximize) {
 	if (UIWizardSettings::disableWindowMaximizing) {
 		return;
 	}
 
 	// Enter maximized
-	if (forceEnterMaximize || !UIWHWindow::IsWindowState("Maximized")) {
+	if (forceEnterMaximize || !forceExitMaximize && !UIWHWindow::IsWindowState("Maximized")) {
 		SaveWindowMetrics();
 
 		if (UIWHWindow::IsWindowState("Fullscreen")) {
@@ -1039,6 +1063,7 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 		// Window Appearance
 		case WM_ACTIVATE: {
 			UIWizard::Shadow()->ShadowWindowActiveState(wParam);
+			UIWizard::Window()->HandleWindowFullscreenActiveState(wParam);
 			break;
 		}
 		case WM_ERASEBKGND: {
@@ -1069,6 +1094,7 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 		case WM_NCLBUTTONDOWN: {
 			if (wParam == HTCAPTION) {
 				UIWizard::Window()->DragStart(lParam, false);
+				SetForegroundWindow(hWnd);
 				return 0;
 			}
 			break;
