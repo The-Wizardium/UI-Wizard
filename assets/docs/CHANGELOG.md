@@ -42,6 +42,21 @@ weaving elegance and stability into foobar2000’s ethereal form.*
 <br>
 <br>
 
+## Version 0.2.3 - 08-11-2025
+This release is a hotfix addressing fullscreen and window state issues.
+
+<br>
+
+### Fixed:
+- Fixed bug in exiting fullscreen toggle via the API `ExitFullscreen` method.
+- Fixed Alt + Tab handling while in fullscreen window state.
+- Fixed window focus restoration when clicking on the title bar.
+- Fixed window state enum mappings to match API docs for `WindowState` getter: // 0 (Normal), 1 (Maximized), 2 (Fullscreen)
+- Fixed display of the caption area indicator when changing caption area values in the UI Wizard preferences.
+
+<br>
+<br>
+
 ## Version 0.2.2 - 20-09-2025
 This release is a hotfix addressing a Windows 11-specific issue with rounded corners
 causing gaps in maximized and fullscreen window states.
