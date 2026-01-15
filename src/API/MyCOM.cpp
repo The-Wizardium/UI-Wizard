@@ -3,9 +3,9 @@
 // * Description:    MyCOM Source File                                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.4                                                   * //
+// * Version:        0.2.5                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    08-11-2025                                              * //
+// * Last change:    27-12-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 

@@ -42,6 +42,19 @@ weaving elegance and stability into foobar2000’s ethereal form.*
 <br>
 <br>
 
+## Version 0.2.5 - 15-01-2026
+This release implements a more robust window validation system, preventing accidental resets while fully supporting window-snapping features.
+
+<br>
+
+### Fixed:
+- **Premature Window Resets**: Fixed an issue where the window would incorrectly reset to the center or default position when placed near monitor edges. This restoration also ensures seamless compatibility with native window-snapping features.
+- **Persistence of Accessibility**: Improved boundary logic to align with standard OS behavior, where a window position is only invalidated if the caption area becomes unreachable. The window now allows a **50 px overhang** for maintaining "grab-ability" before triggering a safety reset.
+- **Multi-Monitor Boundary Logic**: Corrected an error where windows were being validated against the primary monitor's work area instead of the specific monitor they currently occupy.
+
+<br>
+<br>
+
 ## Version 0.2.4 - 16-12-2025
 This release is a small update that restores the default ESC key behavior.
 

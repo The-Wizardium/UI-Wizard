@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Helpers Source File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.4                                                   * //
+// * Version:        0.2.5                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    08-11-2025                                              * //
+// * Last change:    15-11-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -773,13 +773,33 @@ namespace UIWHWindow {
 		RECT windowRect;
 		GetWindowRect(hWnd, &windowRect);
 
-		LONG leftBound = mi.rcMonitor.left + bufferPx;
-		LONG topBound = mi.rcMonitor.top + bufferPx;
-		LONG rightBound = mi.rcMonitor.right - bufferPx;
-		LONG bottomBound = mi.rcMonitor.bottom - bufferPx;
+		LONG monLeft = mi.rcWork.left;
+		LONG monTop = mi.rcWork.top;
+		LONG monRight = mi.rcWork.right;
+		LONG monBottom = mi.rcWork.bottom;
 
-		if (windowRect.left < leftBound || windowRect.top < topBound ||
-			windowRect.right > rightBound || windowRect.bottom > bottomBound) {
+		// Accessibility Check
+		long capLeft = windowRect.left + UIWizardSettings::captionLeft;
+		long capTop = windowRect.top + UIWizardSettings::captionTop;
+		long capWidth = UIWizardSettings::captionWidth > 0 ? UIWizardSettings::captionWidth : windowRect.right - windowRect.left;
+		long capRight = capLeft + capWidth;
+
+		long visibleLeft = std::max(capLeft, monLeft);
+		long visibleRight = std::min(capRight, monRight);
+		long visibleWidth = std::max(0L, visibleRight - visibleLeft);
+
+		bool isHorizAccessible = visibleWidth >= bufferPx;
+		bool isVertAccessible = (capTop >= monTop - bufferPx) && (capTop < monBottom - bufferPx);
+
+		// Boundary Overhang Check
+		bool isTooFarLeft = windowRect.left < (monLeft - bufferPx);
+		bool isTooFarRight = windowRect.right > (monRight + bufferPx);
+		bool isTooFarTop = windowRect.top < (monTop - bufferPx);
+		bool isTooFarBottom = windowRect.bottom > (monBottom + bufferPx);
+		bool isTooFarOff = isTooFarLeft || isTooFarRight || isTooFarTop || isTooFarBottom;
+
+		// Reset if inaccessible or if the window is too far over the boundaries
+		if (!isHorizAccessible || !isVertAccessible || isTooFarOff) {
 			UIWHWindow::SetWindowPositionInGrid(hWnd, resetPosition);
 		}
 	}

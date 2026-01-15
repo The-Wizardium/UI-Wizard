@@ -3,7 +3,7 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.4                                                   * //
+// * Version:        0.2.5                                                   * //
 // * Dev. started:   12-12-2024                                              * //
 // * Last change:    16-12-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////

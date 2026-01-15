@@ -3,7 +3,7 @@
 // * Description:    UI Wizard Helpers Header File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.4                                                   * //
+// * Version:        0.2.5                                                   * //
 // * Dev. started:   12-12-2024                                              * //
 // * Last change:    19-09-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////
@@ -194,7 +194,7 @@ namespace UIWHWindow {
 
 	void SetWindowPosition(HWND hWnd, int x, int y);
 	void SetWindowPositionInGrid(HWND hWnd, const std::string& position);
-	void ValidateWindowPosition(HWND hWnd, const std::string& resetPosition = "center", int bufferPx = 10);
+	void ValidateWindowPosition(HWND hWnd, const std::string& resetPosition = "center", int bufferPx = 50);
 
 	void SetWindowSize(HWND hWnd, int width, int height);
 	void ValidateWindowSize(HWND hWnd);
