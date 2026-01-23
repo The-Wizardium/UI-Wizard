@@ -45,7 +45,7 @@ from its crystalline geometry to its very state of being.*
 
 # UI Wizard - API Reference
 
-*Version 0.2 - Last Updated: 16.09.2025*
+*Version 0.3 - Last Updated: 21.01.2026*
 
 UI Wizard provides a JavaScript API for advanced window management and appearance customization in foobar2000,
 accessible via a COM/ActiveX interface in scripting environments like
@@ -81,11 +81,13 @@ Set window frame style and background color:
 function customizeWindowAppearance() {
 	if (!UIWizard) return;
 
+	const RGB = (r, g, b) => (0xff000000 | (r << 16) | (g << 8) | (b));
+
 	UIWizard.FrameStyle = 3; // Set to No Border
 	console.log('Frame Style set to:', UIWizard.FrameStyle); // 3 (No Border)
 
 	UIWizard.WindowBgColor = RGB(255, 0, 0); // Set background to red (RGB)
-	console.log('Window Background Color set to:', UIWizard.WindowBgColor.toString(16));
+	console.log('Window Background Color set to:', UIWizard.WindowBgColor);
 }
 ```
 

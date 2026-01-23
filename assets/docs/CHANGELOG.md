@@ -42,6 +42,18 @@ weaving elegance and stability into foobar2000’s ethereal form.*
 <br>
 <br>
 
+## Version 0.2.6 - 23-01-2026
+This release resolves a critical COM ABI compatibility issue in 32-bit builds and ensures correct window background color handling when set from JavaScript.
+
+<br>
+
+### Fixed:
+- **COM ABI Mismatch on VARIANT Parameters**: Fixed a COM ABI incompatibility in VARIANT handling that caused crashes on x86 builds.
+- **Window Background Color Channel Swapping**: Corrected COLORREF byte-order handling in `WindowBgColor` setter/getter, ensuring colors set via the JavaScript `RGB` helper now display exactly as intended.
+
+<br>
+<br>
+
 ## Version 0.2.5 - 15-01-2026
 This release implements a more robust window validation system, preventing accidental resets while fully supporting window-snapping features.
 

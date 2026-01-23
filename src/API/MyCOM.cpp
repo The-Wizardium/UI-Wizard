@@ -3,9 +3,9 @@
 // * Description:    MyCOM Source File                                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.5                                                   * //
+// * Version:        0.2.6                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    27-12-2025                                              * //
+// * Last change:    23-01-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -482,37 +482,37 @@ STDMETHODIMP MyCOM::get_WindowHeight(long* pValue) {
 // * MyCOM - PUBLIC API - WINDOW SIZE CONSTRAINTS PROPERTIES * //
 /////////////////////////////////////////////////////////////////
 #pragma region MyCOM - Public API - Window Size Constraints Properties
-STDMETHODIMP MyCOM::put_WindowMinSize(const VARIANT& newState) {
+STDMETHODIMP MyCOM::put_WindowMinSize(VARIANT newState) {
 	bool convertedState = UIWHConvert::BOOLFromVARIANT(newState, UIWizardSettings::windowMinSizeDefault);
 	UIWizardSettings::windowMinSize = convertedState;
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_WindowMinWidth(const VARIANT& newValue) {
+STDMETHODIMP MyCOM::put_WindowMinWidth(VARIANT newValue) {
 	int convertedValue = UIWHConvert::INTFromVARIANT(newValue, UIWizardSettings::windowMinWidthDefault);
 	UIWizardSettings::windowMinWidth = convertedValue;
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_WindowMinHeight(const VARIANT& newValue) {
+STDMETHODIMP MyCOM::put_WindowMinHeight(VARIANT newValue) {
 	int convertedValue = UIWHConvert::INTFromVARIANT(newValue, UIWizardSettings::windowMinHeightDefault);
 	UIWizardSettings::windowMinHeight = convertedValue;
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_WindowMaxSize(const VARIANT& newState) {
+STDMETHODIMP MyCOM::put_WindowMaxSize(VARIANT newState) {
 	bool convertedState = UIWHConvert::BOOLFromVARIANT(newState, UIWizardSettings::windowMaxSizeDefault);
 	UIWizardSettings::windowMaxSize = convertedState;
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_WindowMaxWidth(const VARIANT& newValue) {
+STDMETHODIMP MyCOM::put_WindowMaxWidth(VARIANT newValue) {
 	int convertedValue = UIWHConvert::INTFromVARIANT(newValue, UIWizardSettings::windowMaxWidthDefault);
 	UIWizardSettings::windowMaxWidth = convertedValue;
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_WindowMaxHeight(const VARIANT& newValue) {
+STDMETHODIMP MyCOM::put_WindowMaxHeight(VARIANT newValue) {
 	int convertedValue = UIWHConvert::INTFromVARIANT(newValue, UIWizardSettings::windowMaxHeightDefault);
 	UIWizardSettings::windowMaxHeight = convertedValue;
 	return S_OK;
@@ -524,13 +524,42 @@ STDMETHODIMP MyCOM::put_WindowMaxHeight(const VARIANT& newValue) {
 // * MyCOM - PUBLIC API - WINDOW APPEARANCE PROPERTIES * //
 ///////////////////////////////////////////////////////////
 #pragma region MyCOM - Public API - Window Appearance Properties
-STDMETHODIMP MyCOM::put_WindowBgColor(const VARIANT& newValue) {
+STDMETHODIMP MyCOM::get_WindowBgColor(BSTR* pValue) {
+	if (!pValue) {
+		return UIWHCOM::LogError(E_POINTER, L"UI Wizard => MyCOM::get_WindowBgColor", L"Invalid pointer");
+	}
+
+	auto color = static_cast<COLORREF>(UIWizardSettings::windowBgColor);
+
+	int r = GetRValue(color);
+	int g = GetGValue(color);
+	int b = GetBValue(color);
+
+	std::wstring rgbStr = std::to_wstring(r) + L", " + std::to_wstring(g) + L", " + std::to_wstring(b);
+
+	*pValue = SysAllocString(rgbStr.c_str());
+
+	if (!*pValue) {
+		return UIWHCOM::LogError(E_OUTOFMEMORY, L"UI Wizard => MyCOM::get_WindowBgColor", L"Out of memory");
+	}
+
+	return S_OK;
+}
+
+STDMETHODIMP MyCOM::put_WindowBgColor(VARIANT newValue) {
 	static bool firstBgColorInit = true;
 	int convertedValue = UIWHConvert::INTFromVARIANT(newValue, UIWizardSettings::windowBgColorDefault);
-	UIWizardSettings::windowBgColor = convertedValue;
+
+	BYTE originalR = (convertedValue >> 16) & 0xFF;
+	BYTE originalG = (convertedValue >> 8) & 0xFF;
+	BYTE originalB = convertedValue & 0xFF;
+
+	auto correctedColor = RGB(originalR, originalG, originalB);
+
+	UIWizardSettings::windowBgColor = correctedColor;
 
 	if (firstBgColorInit && UIWizard::Window()) {
-		UIWizard::Window()->SetBgColor(static_cast<COLORREF>(convertedValue));
+		UIWizard::Window()->SetBgColor(correctedColor);
 		RedrawWindow(UIWizard::MainWindow(), nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE | RDW_UPDATENOW);
 		firstBgColorInit = false;
 	}
@@ -547,7 +576,7 @@ STDMETHODIMP MyCOM::get_DarkMode(VARIANT_BOOL* pState) {
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_DarkMode(const VARIANT& newState) {
+STDMETHODIMP MyCOM::put_DarkMode(VARIANT newState) {
 	bool convertedState = UIWHConvert::BOOLFromVARIANT(newState, UIWHDarkMode::IsDark());
 	UIWHDarkMode::SetDark(convertedState);
 	return S_OK;
@@ -562,7 +591,7 @@ STDMETHODIMP MyCOM::get_FrameStyle(long* pValue) {
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_FrameStyle(const VARIANT& newValue) {
+STDMETHODIMP MyCOM::put_FrameStyle(VARIANT newValue) {
 	if (!UIWizard::Window()) {
 		return UIWHCOM::LogError(E_UNEXPECTED, L"UI Wizard => MyCOM::put_FrameStyle", L"Window not initialized");
 	}
@@ -593,7 +622,7 @@ STDMETHODIMP MyCOM::get_MoveStyle(long* pValue) {
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_MoveStyle(const VARIANT& newValue) {
+STDMETHODIMP MyCOM::put_MoveStyle(VARIANT newValue) {
 	int convertedValue = UIWHConvert::INTFromVARIANT(newValue, UIWizardSettings::moveStyleDefault);
 	UIWizardSettings::moveStyle = convertedValue;
 	return S_OK;
@@ -608,7 +637,7 @@ STDMETHODIMP MyCOM::get_DisableWindowMaximizing(VARIANT_BOOL* pState) {
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_DisableWindowMaximizing(const VARIANT& newState) {
+STDMETHODIMP MyCOM::put_DisableWindowMaximizing(VARIANT newState) {
 	bool convertedState = UIWHConvert::BOOLFromVARIANT(newState, UIWizardSettings::disableWindowMaximizingDefault);
 	UIWizardSettings::disableWindowMaximizing = convertedState;
 	return S_OK;
@@ -623,7 +652,7 @@ STDMETHODIMP MyCOM::get_DisableWindowSizing(VARIANT_BOOL* pState) {
 	return S_OK;
 }
 
-STDMETHODIMP MyCOM::put_DisableWindowSizing(const VARIANT& newState) {
+STDMETHODIMP MyCOM::put_DisableWindowSizing(VARIANT newState) {
 	bool convertedState = UIWHConvert::BOOLFromVARIANT(newState, UIWizardSettings::windowMinSizeDefault);
 	UIWizardSettings::disableWindowSizing = convertedState;
 	return S_OK;

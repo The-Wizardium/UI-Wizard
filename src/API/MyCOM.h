@@ -3,9 +3,9 @@
 // * Description:    MyCOM Header File                                       * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.5                                                   * //
+// * Version:        0.2.6                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    23-01-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -61,27 +61,28 @@ public:
 	STDMETHOD(get_WindowHeight)(long* pValue);
 
 	// * PUBLIC API - WINDOW SIZE CONSTRAINTS PROPERTIES * //
-	STDMETHOD(put_WindowMinSize)(const VARIANT& newState);
-	STDMETHOD(put_WindowMinWidth)(const VARIANT& newValue);
-	STDMETHOD(put_WindowMinHeight)(const VARIANT& newValue);
-	STDMETHOD(put_WindowMaxSize)(const VARIANT& newState);
-	STDMETHOD(put_WindowMaxWidth)(const VARIANT& newValue);
-	STDMETHOD(put_WindowMaxHeight)(const VARIANT& newValue);
+	STDMETHOD(put_WindowMinSize)(VARIANT newState);
+	STDMETHOD(put_WindowMinWidth)(VARIANT newValue);
+	STDMETHOD(put_WindowMinHeight)(VARIANT newValue);
+	STDMETHOD(put_WindowMaxSize)(VARIANT newState);
+	STDMETHOD(put_WindowMaxWidth)(VARIANT newValue);
+	STDMETHOD(put_WindowMaxHeight)(VARIANT newValue);
 
 	// * PUBLIC API - WINDOW APPEARANCE PROPERTIES * //
-	STDMETHOD(put_WindowBgColor)(const VARIANT& newValue);
+	STDMETHOD(get_WindowBgColor)(BSTR* pValue);
+	STDMETHOD(put_WindowBgColor)(VARIANT newValue);
 	STDMETHOD(get_DarkMode)(VARIANT_BOOL* pState);
-	STDMETHOD(put_DarkMode)(const VARIANT& newState);
+	STDMETHOD(put_DarkMode)(VARIANT newState);
 	STDMETHOD(get_FrameStyle)(long* pValue);
-	STDMETHOD(put_FrameStyle)(const VARIANT& newValue);
+	STDMETHOD(put_FrameStyle)(VARIANT newValue);
 
 	// * PUBLIC API - WINDOW BEHAVIOR PROPERTIES * //
 	STDMETHOD(get_MoveStyle)(long* pValue);
-	STDMETHOD(put_MoveStyle)(const VARIANT& newValue);
+	STDMETHOD(put_MoveStyle)(VARIANT newValue);
 	STDMETHOD(get_DisableWindowMaximizing)(VARIANT_BOOL* pState);
-	STDMETHOD(put_DisableWindowMaximizing)(const VARIANT& newState);
+	STDMETHOD(put_DisableWindowMaximizing)(VARIANT newState);
 	STDMETHOD(get_DisableWindowSizing)(VARIANT_BOOL* pState);
-	STDMETHOD(put_DisableWindowSizing)(const VARIANT& newState);
+	STDMETHOD(put_DisableWindowSizing)(VARIANT newState);
 
 	// * PUBLIC API - WINDOW STATE PROPERTIES * //
 	STDMETHOD(get_WindowState)(long* pValue);

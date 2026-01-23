@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.5                                                   * //
+// * Version:        0.2.6                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-12-2025                                              * //
+// * Last change:    23-01-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -235,17 +235,13 @@ bool UIWizardWindow::CreateWindowBgBrush() {
 }
 
 COLORREF UIWizardWindow::GetWindowBgColor() const {
-	auto colorValue = static_cast<unsigned int>(UIWizardSettings::windowBgColor);
+	auto colorValue = static_cast<COLORREF>(UIWizardSettings::windowBgColor);
 
 	if (colorValue == UIWizardSettings::windowBgColorDefault) {
 		return CLR_INVALID; // Special value to indicate "no custom color"
 	}
 
-	// CreateSolidBrush expects a COLORREF so mask out the alpha channel if it's not needed.
-	// This ensures the high-order byte is zero, complying with COLORREF's format.
-	colorValue &= 0x00FFFFFF;
-
-	return RGB((colorValue >> 16) & 0xFF, (colorValue >> 8) & 0xFF, colorValue & 0xFF);
+	return colorValue;
 }
 
 void UIWizardWindow::SetWindowBgColor(WPARAM wParam) {

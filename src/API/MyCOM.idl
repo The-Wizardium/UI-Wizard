@@ -3,9 +3,9 @@
 // * Description:    MyCOM Type Library File                                 * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.5                                                   * //
+// * Version:        0.2.6                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    16-09-2025                                              * //
+// * Last change:    23-01-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -42,6 +42,7 @@ interface MyCOMAPI : IDispatch {
 	[propput, id(14)] HRESULT WindowMaxHeight([in] VARIANT newValue);
 
 	// * PUBLIC API - WINDOW APPEARANCE PROPERTIES * //
+	[propget, id(15)] HRESULT WindowBgColor([out, retval] BSTR* pValue);
 	[propput, id(15)] HRESULT WindowBgColor([in] VARIANT newValue);
 	[propget, id(16)] HRESULT DarkMode([out, retval] VARIANT_BOOL* pState);
 	[propput, id(16)] HRESULT DarkMode([in] VARIANT newState);
