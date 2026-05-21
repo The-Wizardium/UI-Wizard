@@ -42,6 +42,17 @@ weaving elegance and stability into foobar2000’s ethereal form.*
 <br>
 <br>
 
+## Version 0.2.7 - 21-05-2026
+This release fixes the notorious "ghost shadow" window that appears on other virtual desktops.
+
+<br>
+
+### Fixed:
+- **Phantom Shadow on Virtual Desktops**: The shadow window no longer remains visible as an untouchable ghost when the main window is moved to another virtual desktop. It now properly tracks DWM cloaking events (`EVENT_OBJECT_CLOAKED` / `EVENT_OBJECT_UNCLOAKED`) and hides/shows in sync with the main window.
+
+<br>
+<br>
+
 ## Version 0.2.6 - 23-01-2026
 This release resolves a critical COM ABI compatibility issue in 32-bit builds and ensures correct window background color handling when set from JavaScript.
 

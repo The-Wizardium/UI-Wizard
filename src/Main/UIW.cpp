@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Source File                                   * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.6                                                   * //
+// * Version:        0.2.7                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    23-01-2026                                              * //
+// * Last change:    21-05-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -21,7 +21,7 @@
 /////////////////////////
 #pragma region Component Setup
 DECLARE_COMPONENT_VERSION(
-	"UI Wizard", "0.2.6",
+	"UI Wizard", "0.2.7",
 
 	"UI Wizard \n"
 	"The Sapphire Spell Of Interface Enchantment \n"

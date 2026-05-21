@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Header File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.6                                                   * //
+// * Version:        0.2.7                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    08-11-2025                                              * //
+// * Last change:    21-05-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -193,5 +193,11 @@ public:
 
 protected:
 	static LRESULT CALLBACK ShadowWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+private:
+	static inline HWINEVENTHOOK cloakHook = nullptr;
+	static void CALLBACK CloakEventProc(HWINEVENTHOOK hHook, DWORD event, HWND hWnd,
+		LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime
+	);
 };
 #pragma endregion

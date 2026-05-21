@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.6                                                   * //
+// * Version:        0.2.7                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    23-01-2026                                              * //
+// * Last change:    21-05-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1300,12 +1300,37 @@ UIWizardShadowWindow::UIWizardShadowWindow(HWND hWnd) : UIWizardWindow(hWnd) {
 }
 
 UIWizardShadowWindow::~UIWizardShadowWindow() {
+	if (cloakHook) {
+		UnhookWinEvent(cloakHook);
+		cloakHook = nullptr;
+	}
+
 	if (IsWindow(shadowHwnd)) {
 		ShowWindow(shadowHwnd, SW_HIDE);
 		DestroyWindow(shadowHwnd);
 	}
 
 	shadowHwnd = nullptr;
+}
+
+void CALLBACK UIWizardShadowWindow::CloakEventProc(HWINEVENTHOOK, DWORD event, HWND hWnd, LONG idObject, LONG, DWORD, DWORD) {
+	HWND shadow = UIWizard::Shadow()->shadowHwnd;
+
+	// We only care about DWM cloaking events for our specific main window
+	if (!shadow || idObject != OBJID_WINDOW ||
+		!UIWizard::Window() || hWnd != UIWizard::Window()->mainHwnd) {
+		return;
+	}
+
+	// Main window was cloaked (e.g. moved to an inactive virtual desktop)
+	if (event == EVENT_OBJECT_CLOAKED) {
+		ShowWindow(shadow, SW_HIDE);
+	}
+	// Main window is uncloaked (e.g. user switched back to its virtual desktop)
+	else if (event == EVENT_OBJECT_UNCLOAKED && !IsIconic(hWnd) && UIWHWindow::IsWindowState("Normal")) {
+		ShowWindow(shadow, SW_SHOWNA);
+		UIWizard::Shadow()->ShadowWindowUpdate();
+	}
 }
 
 LRESULT CALLBACK UIWizardShadowWindow::ShadowWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -1379,6 +1404,16 @@ HWND UIWizardShadowWindow::ShadowWindow() {
 	SetClassLongPtr(shadowHwnd, GCLP_HBRBACKGROUND, (LONG_PTR)GetStockObject(HOLLOW_BRUSH));
 
 	ShowWindow(shadowHwnd, SW_SHOW);
+
+	// Register once to track DWM cloaking of the main window
+	if (!cloakHook) {
+		cloakHook = SetWinEventHook(
+			EVENT_OBJECT_CLOAKED, EVENT_OBJECT_UNCLOAKED,
+			nullptr, CloakEventProc,
+			GetCurrentProcessId(), 0,
+			WINEVENT_OUTOFCONTEXT // Runs safely on this thread's message loop
+		);
+	}
 
 	// Set the shadow window activation state immediately after creation for full shadow effect
 	ShadowWindowActiveState(0, true);
