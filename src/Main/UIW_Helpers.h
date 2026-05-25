@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Helpers Header File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.7                                                   * //
+// * Version:        0.2.8                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    19-09-2025                                              * //
+// * Last change:    24-05-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -167,6 +167,33 @@ namespace UIWHGraphics {
 	HICON GetDefaultIcon();
 	void SetIcon(HWND hWndMain, HWND hWndDialog, bool customIcon, const std::string& customIconPath);
 	void WindowRepaint(HWND hWnd);
+};
+#pragma endregion
+
+
+//////////////////////////////
+// * TITLE FORMAT HELPERS * //
+//////////////////////////////
+#pragma region Title Format Helpers
+namespace UIWHTitleFormat {
+	// Runs a compiled titleformat_object with no track context.
+	// All %field% references resolve to empty, so [...] brackets collapse.
+	// e.g. "My Player[ - %album artist% - %title%]" -> "My Player"
+	inline void RunStopped(const service_ptr_t<titleformat_object>& obj, pfc::string8& out) {
+		struct NullHook final : titleformat_hook {
+			bool process_field(titleformat_text_out*, const char*, t_size,
+				bool& p_found_flag) override {
+				p_found_flag = false;
+				return false;
+			}
+			bool process_function(titleformat_text_out*, const char*, t_size,
+				titleformat_hook_function_params*, bool& p_found_flag) override {
+				p_found_flag = false;
+				return false;
+			}
+		} hook;
+		obj->run(&hook, out, nullptr);
+	}
 };
 #pragma endregion
 

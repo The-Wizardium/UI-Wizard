@@ -3,7 +3,7 @@
 // * Description:    UI Wizard Helpers Source File                           * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.7                                                   * //
+// * Version:        0.2.8                                                   * //
 // * Dev. started:   12-12-2024                                              * //
 // * Last change:    15-11-2025                                              * //
 /////////////////////////////////////////////////////////////////////////////////

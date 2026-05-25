@@ -42,6 +42,25 @@ weaving elegance and stability into foobar2000’s ethereal form.*
 <br>
 <br>
 
+## Version 0.2.8 - 25-05-2026
+This release improves custom window title handling and removes the version number from the taskbar when using a custom title.
+
+<br>
+
+### Changed:
+- Custom title is now enabled by default with a smart fallback: `$if(%title%,[%album artist% - ]%title%,foobar2000)`.
+- When stopped, custom titles now properly collapse empty fields (no trailing dashes or spaces).
+- Original foobar2000 can no longer overwrite custom titles via `WM_SETTEXT`.
+- Improved title formatting logic for both playing and stopped states.
+- Empty custom title strings are now fully respected (title bar will show no text).
+
+### Fixed:
+- Version number no longer appears in the taskbar when a custom title is active.
+- Trailing dash issue when using custom title formatting.
+
+<br>
+<br>
+
 ## Version 0.2.7 - 21-05-2026
 This release fixes the notorious "ghost shadow" window that appears on other virtual desktops.
 

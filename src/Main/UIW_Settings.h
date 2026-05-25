@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Settings Header File                          * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.7                                                   * //
+// * Version:        0.2.8                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    19-09-2025                                              * //
+// * Last change:    24-05-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -109,8 +109,8 @@ public:
 	static constexpr bool customIconDefault = false;
 	static constexpr const char* customIconPathDefault = "";
 
-	static constexpr bool customTitleDefault = false;
-	static constexpr const char* customTitleStringDefault = "foobar2000";
+	static constexpr bool customTitleDefault = true;
+	static constexpr const char* customTitleStringDefault = "$if(%title%,[%album artist% - ]%title%,foobar2000)";
 
 	static constexpr bool hideTaskbarIconDefault = false;
 

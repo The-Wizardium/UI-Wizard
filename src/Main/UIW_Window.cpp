@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Source File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.7                                                   * //
+// * Version:        0.2.8                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    21-05-2026                                              * //
+// * Last change:    24-05-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -284,26 +284,45 @@ pfc::string8 UIWizardWindow::GetWindowTitle() const {
 
 	pfc::string8 windowTitleStr;
 
-	// Determine the base title: custom title name or default title name
-	if (UIWizardSettings::customTitle && !UIWizardSettings::customTitleString.empty()) {
-		windowTitleStr = UIWizardSettings::customTitleString.get_ptr();
+	if (UIWizardSettings::customTitle) {
+		pfc::string8 customStr = UIWizardSettings::customTitleString.get_ptr();
+		customStr.skip_trailing_chars(" "); // treat whitespace-only as empty
+
+		if (!customStr.is_empty()) {
+			// Compile the custom string as a titleformat script once for both branches.
+			service_ptr_t<titleformat_object> to_custom;
+			titleformat_compiler::get()->compile_safe(to_custom, customStr);
+
+			if (track.is_valid()) {
+				// Playing: format with full track metadata.
+				play_api->playback_format_title_ex(
+					track, nullptr, windowTitleStr, to_custom, nullptr,
+					play_control::display_level_all
+				);
+			}
+			else {
+				// Stopped: run with no track context.
+				UIWHTitleFormat::RunStopped(to_custom, windowTitleStr);
+			}
+		}
 	}
 	else {
+		// Default behaviour: "foobar2000 vX.Y.Z" + " - Artist - Title" when playing.
 		auto core_info = core_version_info_v2::get();
 		windowTitleStr = core_info->get_name();
 		windowTitleStr += " ";
 		windowTitleStr += core_info->get_version_as_text();
-	}
 
-	// If a track is currently playing, append its artist and title
-	if (track.is_valid()) {
-		pfc::string8 trackTitle;
-		service_ptr_t<titleformat_object> to_wtitle;
-
-		titleformat_compiler::get()->compile_safe(to_wtitle, " - %artist% - %title%");
-		play_api->playback_format_title_ex(track, nullptr, trackTitle, to_wtitle, nullptr, play_control::display_level_all);
-
-		windowTitleStr += trackTitle;
+		if (track.is_valid()) {
+			pfc::string8 trackTitle;
+			service_ptr_t<titleformat_object> to_wtitle;
+			titleformat_compiler::get()->compile_safe(to_wtitle, " - %artist% - %title%");
+			play_api->playback_format_title_ex(
+				track, nullptr, trackTitle, to_wtitle, nullptr,
+				play_control::display_level_all
+			);
+			windowTitleStr += trackTitle;
+		}
 	}
 
 	return windowTitleStr;
@@ -322,7 +341,9 @@ void UIWizardWindow::SetWindowTitle() const {
 	pfc::stringcvt::string_wide_from_utf8_fast wideTitle(newTitle);
 
 	if (windowTitleLen == 0 || wcscmp(wideTitle.get_ptr(), windowCurrentTitle.get_ptr()) != 0) {
+		setWindowTitle = true;
 		SetWindowText(mainHwnd, wideTitle.get_ptr());
+		setWindowTitle = false;
 	}
 }
 
@@ -1160,6 +1181,19 @@ LRESULT CALLBACK UIWizardMainWindow::MainWindowProc(HWND hWnd, UINT message, WPA
 		case WM_WINDOWPOSCHANGING: {
 			if (!UIWizard::Window()->windowMinimized && UIWHWindow::IsWindowState("Normal")) {
 				UIWizard::Shadow()->ShadowWindowUpdate();
+			}
+			break;
+		}
+
+		// Window Text
+		case WM_SETTEXT: {
+			// If we're the ones calling SetWindowText, let it through.
+			if (UIWizard::Window()->setWindowTitle) break;
+
+			// Otherwise foobar's core is overwriting us, reapply our title.
+			if (UIWizardSettings::customTitle) {
+				UIWizard::Window()->SetWindowTitle();
+				return TRUE; // Swallow the core's WM_SETTEXT
 			}
 			break;
 		}

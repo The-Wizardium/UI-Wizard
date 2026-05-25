@@ -3,9 +3,9 @@
 // * Description:    UI Wizard Window Header File                            * //
 // * Author:         TT                                                      * //
 // * Website:        https://github.com/The-Wizardium/UI-Wizard              * //
-// * Version:        0.2.7                                                   * //
+// * Version:        0.2.8                                                   * //
 // * Dev. started:   12-12-2024                                              * //
-// * Last change:    21-05-2026                                              * //
+// * Last change:    24-05-2026                                              * //
 /////////////////////////////////////////////////////////////////////////////////
 
 
@@ -84,6 +84,8 @@ public:
 	static const UINT HIDE_WINDOW_INACTIVITY_TIMER_ID = 30430;
 	ULONGLONG hideWindowLastActivityTime = 0;
 	ULONGLONG hideWindowLastInputTime = 0;
+
+	bool mutable setWindowTitle = false;
 
 	// * WINDOW APPEARANCE * //
 	void SetFrameStyle(FrameStyle style, bool forceUpdate = false);
